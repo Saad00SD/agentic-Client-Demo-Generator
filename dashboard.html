@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XPENG Vector — Programme Dashboard</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="assets/favicon.png" type="image/png">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<div id="chrome"></div>
+
+<!-- ============ ADMIN CONSOLE (Sherbet administration layer) ============ -->
+<div class="admin">
+  <div class="admin-top">
+    <div class="admin-top-in">
+      <h1>Programme <span>Dashboard</span></h1>
+      <span class="chip">Programme
+        <select aria-label="Programme"><option>XPENG Vector</option></select></span>
+      <span class="chip">Market
+        <select id="regionFilter" aria-label="Region">
+          <option>All regions</option><option>Germany</option><option>United Kingdom</option>
+          <option>Netherlands</option><option>France</option><option>Spain</option>
+          <option>Italy</option><option>Hungary</option>
+        </select></span>
+      <span class="chip">Period
+        <select aria-label="Period"><option>September 2026</option><option>Q3 2026</option></select></span>
+      <span class="illus"><i></i>Illustrative data</span>
+    </div>
+  </div>
+
+  <div class="wrap" style="padding-top:22px;padding-bottom:46px">
+
+    <!-- Adoption against target. The first question a programme owner asks is
+         not how campaigns are performing, it is whether the network actually
+         joined. That question gets the top of the page. -->
+    <a class="adopt" href="network.html" data-rm="rm-dash-adoption">
+      <div class="adopt-l">
+        <div class="adopt-h">Network adoption against target</div>
+        <div class="adopt-figs">
+          <div><b id="aTarget"></b><span>target network</span></div>
+          <div><b id="aInvited"></b><span>invited</span></div>
+          <div><b id="aReg"></b><span>registered</span></div>
+          <div><b id="aActive"></b><span>active this month</span></div>
+        </div>
+      </div>
+      <div class="adopt-r">
+        <div class="adopt-pct"><b id="aRegPct"></b><span>registration<br>vs target</span></div>
+        <div class="adopt-pct"><b id="aActPct"></b><span>active<br>vs registered</span></div>
+        <span class="adopt-go">Open the network →</span>
+      </div>
+    </a>
+
+    <!-- KPI tiles -->
+    <div class="grid-4" style="margin-bottom:16px" data-rm="rm-dash-kpis">
+      <div class="kpi">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M16 20v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="3.4"/><path d="M17 11l2 2 4-4"/></svg>
+        <div class="n" id="kEnrolled"></div>
+        <div class="c">people enrolled · <b id="kEnrolledSub"></b></div>
+      </div>
+      <div class="kpi">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M22 12h-4l-3 8-6-16-3 8H2"/></svg>
+        <div class="n" id="kActive"></div>
+        <div class="c">active this period · <b>earning or redeeming</b></div>
+      </div>
+      <div class="kpi">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        <div class="n" id="kBranches"></div>
+        <div class="c">retailers · <b id="kBranchesSub"></b></div>
+      </div>
+      <div class="kpi">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+          <rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 11h20M6 15.5h4"/></svg>
+        <div class="n" id="kReward"></div>
+        <div class="c">points issued · <b id="kRewardSub"></b></div>
+      </div>
+    </div>
+
+    <!-- activation + reward issued -->
+    <div class="grid-2" style="margin-bottom:16px">
+      <div class="widget">
+        <div class="widget-h">
+          <h3>Account activation summary</h3>
+          <div class="widget-tools">
+            <span class="mini">Region: <b id="filterEcho">All regions</b></span>
+            <span class="mini">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 1v9m0 0L4.5 6.5M8 10l3.5-3.5M2 13h12"/></svg>
+              Export</span>
+          </div>
+        </div>
+        <div id="actRows"></div>
+        <div class="legend">
+          <span><i style="background:#1B3D6D"></i>Active</span>
+          <span><i style="background:#7FA3C4"></i>Enrolled, not active this period</span>
+          <span><i style="background:#DCE9F2"></i>Invited, not enrolled</span>
+        </div>
+      </div>
+
+      <div class="widget">
+        <div class="widget-h">
+          <h3>Points issued by campaign</h3>
+          <div class="widget-tools">
+            <span class="mini">Period: <b>September</b></span>
+            <span class="mini">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 1v9m0 0L4.5 6.5M8 10l3.5-3.5M2 13h12"/></svg>
+              Export</span>
+          </div>
+        </div>
+        <div class="vbars" id="rewardBars"></div>
+      </div>
+    </div>
+
+    <!-- campaign health donuts -->
+    <div class="grid-3" style="margin-bottom:16px" id="healthGrid" data-rm="rm-dash-health"></div>
+
+    <!-- logins -->
+    <div class="widget">
+      <div class="widget-h">
+        <h3>Account login summary</h3>
+        <div class="widget-tools">
+          <span class="mini">Period: <b>September</b></span>
+          <span class="mini">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 1v9m0 0L4.5 6.5M8 10l3.5-3.5M2 13h12"/></svg>
+            Export</span>
+        </div>
+      </div>
+      <svg class="lchart" id="loginChart" viewBox="0 0 720 180" preserveAspectRatio="none" aria-label="Logins over the period"></svg>
+      <div id="loginLabels" style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);margin-top:8px"></div>
+      <div class="legend"><span><i style="background:#1B3D6D"></i>Daily logins</span>
+        <span><i style="background:#00E0C6"></i>Highest day in the period</span></div>
+    </div>
+
+    <p class="illus-note" style="max-width:78ch">
+      All figures on this dashboard are illustrative demonstration data created for this walkthrough.
+      They do not represent any real programme, account or network performance.
+    </p>
+
+    <div class="panel" style="margin-top:22px;background:#000;color:#fff">
+      <div class="grid-2" style="align-items:center">
+        <div>
+          <h3 style="font-size:20px;color:var(--citrus);margin-bottom:10px">Ask it in plain language instead</h3>
+          <p style="font-size:13.5px;color:rgba(255,255,255,.78);margin-bottom:16px">
+            Every figure on this page can be reached with a question rather than a report request.</p>
+          <a class="btn" href="sherbot.html">Open SherBot →</a>
+        </div>
+        <div class="rail-photo" style="aspect-ratio:16/9"><img src="assets/img/handover-keys.jpg" alt=""></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="foot"></div>
+<div id="modalHost" class="modal"></div>
+
+<script src="assets/data.js"></script>
+<script src="assets/i18n-core.js"></script>
+<script src="assets/i18n-build.js"></script>
+<script src="assets/app.js"></script>
+<script>
+  boot('', {admin:true});
+  const P = DEMO.programme;
+
+  /* adoption band: the same four numbers the Network page opens on */
+  const setT = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  setT('aTarget',  pts(P.targetNetwork));
+  setT('aInvited', pts(P.invited));
+  setT('aReg',     pts(P.enrolled));
+  setT('aActive',  pts(P.activeMonth));
+  setT('aRegPct',  Math.round(P.enrolled / P.targetNetwork * 100) + '%');
+  setT('aActPct',  Math.round(P.activeMonth / P.enrolled * 100) + '%');
+
+  /* --- activation stacked bars --- */
+  document.getElementById('actRows').innerHTML = P.regionRows.map(r=>{
+    const notActive = r.enrolled - r.active;
+    const notEnrol  = r.invited - r.enrolled;
+    const t = r.invited;
+    return `<div class="sbar-row" data-region-row="${r.region}">
+      <span class="sbar-lab">${r.region}</span>
+      <span class="sbar">
+        <span style="width:${r.active/t*100}%;background:#1B3D6D"></span>
+        <span style="width:${notActive/t*100}%;background:#7FA3C4"></span>
+        <span style="width:${notEnrol/t*100}%;background:#DCE9F2"></span>
+      </span>
+      <span class="sbar-val">${pts(r.active)}</span>
+    </div>`;
+  }).join('');
+
+  /* --- reward issued by campaign --- */
+  const maxR = Math.max(...P.rewardByCampaign.map(c=>c.pts));
+  document.getElementById('rewardBars').innerHTML = P.rewardByCampaign.map(c=>`
+    <div class="vbar">
+      <span class="n">${pts(c.pts)}</span>
+      <span class="col" style="height:${c.pts/maxR*100}%"></span>
+      <span class="l">${c.name}</span>
+    </div>`).join('');
+
+  /* --- campaign health donuts: blue with one citrus segment --- */
+  document.getElementById('healthGrid').innerHTML = P.campaignHealth.map(c=>{
+    const total = c.onTarget + c.below;
+    const frac  = c.below / total;
+    const R = 52, C = 2 * Math.PI * R;
+    return `<div class="widget">
+      <div class="widget-h"><h3>${c.name}</h3>
+        <span class="mini">Sep</span></div>
+      <div class="donut-wrap">
+        <svg class="donut" viewBox="0 0 120 120" aria-label="${c.name} on target against below target">
+          <circle cx="60" cy="60" r="${R}" fill="none" stroke="#1B3D6D" stroke-width="15"/>
+          <circle cx="60" cy="60" r="${R}" fill="none" stroke="#00E0C6" stroke-width="15"
+                  stroke-dasharray="${(C*frac).toFixed(1)} ${C.toFixed(1)}"
+                  transform="rotate(-90 60 60)"/>
+        </svg>
+        <div class="donut-key">
+          <div><i style="background:#1B3D6D"></i><span><b>${pts(c.onTarget)}</b> on target</span></div>
+          <div><i style="background:#00E0C6"></i><span><b>${pts(c.below)}</b> below target</span></div>
+          <div class="donut-avg">Average performance<br><b style="font-size:13px">${c.avg}</b></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  /* --- login line chart --- */
+  const L = P.logins, maxL = Math.max(...L.map(p=>p.v)), W = 720, H = 180, pad = 14;
+  const x = i => pad + i * (W - pad*2) / (L.length - 1);
+  const y = v => H - pad - (v / maxL) * (H - pad*2);
+  const pts2 = L.map((p,i)=>`${x(i).toFixed(1)},${y(p.v).toFixed(1)}`).join(' ');
+  const peak = L.reduce((a,b)=>b.v>a.v?b:a);
+  const pi = L.indexOf(peak);
+  document.getElementById('loginChart').innerHTML = `
+    <polyline points="${pad},${H-pad} ${pts2} ${W-pad},${H-pad}" fill="#DCE9F2" opacity=".45" stroke="none"/>
+    <polyline points="${pts2}" fill="none" stroke="#1B3D6D" stroke-width="2.5"/>
+    ${L.map((p,i)=>`<circle cx="${x(i)}" cy="${y(p.v)}" r="${i===pi?5:3.2}"
+      fill="${i===pi?'#00E0C6':'#1B3D6D'}" stroke="${i===pi?'#000':'none'}" stroke-width="${i===pi?1.6:0}"/>`).join('')}`;
+  document.getElementById('loginLabels').innerHTML = L.map(p=>`<span>${p.d}</span>`).join('');
+</script>
+</body>
+</html>

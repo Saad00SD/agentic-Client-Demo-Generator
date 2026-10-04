@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XPENG Vector — Game Mechanics</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="assets/favicon.png" type="image/png">
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/gamification.css">
+<link rel="stylesheet" href="assets/gamification-vivid.css">
+</head>
+<body>
+<div id="chrome"></div>
+
+<section class="pb-hero">
+  <h1>Game Mechanics</h1>
+  <p>Six reward mechanics from across the platform, together on one page for a quick walkthrough</p>
+</section>
+<div class="crumb"><div class="crumb-in"><a href="index.html">Home</a> &nbsp;&rsaquo;&nbsp; Game Mechanics</div></div>
+
+<div class="wrap section">
+
+  <div class="panel">
+    <p class="sub" style="max-width:74ch">There is a rich library of game mechanics and styles to
+      choose from, which the Sherbet team adds to regularly. Bespoke game builds are also possible.</p>
+  </div>
+
+  <!-- 1. Spin & Win -->
+  <div class="panel gg-panel gg-showcase">
+    <div class="gg-game-body">
+      <div class="gg-banner" style="background-image:url(assets/img/gm-spin.jpg)">
+        <span class="illus"><i></i>Illustrative</span>
+        <div class="gg-banner-txt">
+          <h2 class="h-sec">Spin &amp; Win</h2>
+          <p class="sub">A guaranteed spin on hitting a milestone. Every segment pays something.</p>
+        </div>
+      </div>
+      <div class="gg-wheel-wrap">
+        <div class="gg-wheel"><div class="gg-wheel-pointer"></div><div id="ggWheelS"></div></div>
+        <div>
+          <p class="gg-count">You have <strong id="ggSpinsAvailS">2</strong> spins available</p>
+          <button class="gg-spin-btn" id="ggSpinBtnS">Spin the wheel</button>
+          <p class="gg-result" id="ggResultS" aria-live="polite"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Scratchcard -->
+  <div class="panel gg-panel gg-showcase">
+    <div class="gg-game-body">
+      <div class="gg-banner" style="background-image:url(assets/img/gm-scratchcard.jpg)">
+        <span class="illus"><i></i>Illustrative</span>
+        <div class="gg-banner-txt">
+          <h2 class="h-sec">Scratchcard</h2>
+          <p class="sub">An instant reveal on top of the points already earned.</p>
+        </div>
+      </div>
+      <div class="gg-scratch-wrap">
+        <div class="gg-scratch-card">
+          <div class="gg-scratch-prize">£25 bonus in points</div>
+          <canvas class="gg-scratch-canvas" id="ggScratchCanvasS" width="360" height="200"></canvas>
+        </div>
+        <p class="gg-hint">Drag or swipe across the card to scratch it off.</p>
+        <button class="gg-scratch-reset" data-reset-s>Reset card</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Slots -->
+  <div class="panel gg-panel gg-showcase">
+    <div class="gg-game-body">
+      <div class="gg-banner" style="background-image:url(assets/img/gm-slots.jpg)">
+        <span class="illus"><i></i>Illustrative</span>
+        <div class="gg-banner-txt">
+          <h2 class="h-sec">Slots</h2>
+          <p class="sub">Pull the lever. Three matching symbols pays out on the spot.</p>
+        </div>
+      </div>
+      <div class="gg-slots-wrap">
+        <div class="gg-reels" id="ggReelsS"></div>
+        <div>
+          <button class="gg-spin-btn" id="ggSlotsBtnS">Pull the lever</button>
+          <p class="gg-result" id="ggSlotsResultS" aria-live="polite"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Match 3 -->
+  <div class="panel gg-panel gg-showcase">
+    <div class="gg-game-body">
+      <div class="gg-banner" style="background-image:url(assets/img/gm-match3.jpg)">
+        <span class="illus"><i></i>Illustrative</span>
+        <div class="gg-banner-txt">
+          <h2 class="h-sec">Match 3</h2>
+          <p class="sub">Flip tiles to find the three star tiles.</p>
+        </div>
+      </div>
+      <div>
+        <div class="gg-match-grid" id="ggMatchGridS"></div>
+        <p class="gg-result" id="ggMatchResultS" aria-live="polite" style="margin-top:16px"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Unlock the Badges -->
+  <div class="panel gg-panel gg-showcase">
+    <div class="gg-game-body">
+      <div class="gg-banner" style="background-image:url(assets/img/gm-badges.jpg)">
+        <span class="illus"><i></i>Illustrative</span>
+        <div class="gg-banner-txt">
+          <h2 class="h-sec">Unlock the Badges</h2>
+          <p class="sub">Complete a module, unlock its badge. Each one pays instantly.</p>
+        </div>
+      </div>
+      <div>
+        <div class="gg-badges" id="ggBadgesS"></div>
+        <p class="gg-badge-complete" id="ggBadgeCompleteS" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Quiz unlock -->
+  <div class="panel gg-panel gg-showcase">
+    <div class="gg-game-body">
+      <div class="gg-banner" style="background-image:url(assets/img/gm-quiz.jpg)">
+        <span class="illus"><i></i>Illustrative</span>
+        <div class="gg-banner-txt">
+          <h2 class="h-sec">Quiz Unlock</h2>
+          <p class="sub">Answer correctly to unlock the reward.</p>
+        </div>
+      </div>
+      <div class="gg-quiz-wrap">
+        <p class="gg-quiz-q" id="ggQuizQS"></p>
+        <div class="gg-quiz-opts" id="ggQuizOptsS"></div>
+        <p class="gg-result" id="ggQuizResultS" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+
+  <p class="illus-note" style="margin-top:8px">Reference page only — not part of the campaign walkthrough.
+    Every prize, question and outcome here is illustrative.</p>
+
+</div>
+
+<div id="foot"></div>
+<div id="modalHost" class="modal"></div>
+
+<script src="assets/config.js"></script>
+<script src="assets/i18n.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/i18n-core.js"></script>
+<script src="assets/i18n-build.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/gamification.js"></script>
+<script>
+  boot('');
+
+  GG.spinWheel({
+    wheelEl: '#ggWheelS', spinBtn: '#ggSpinBtnS', resultEl: '#ggResultS', countEl: '#ggSpinsAvailS',
+    startSpins: 2,
+    prizes: [{label:'50 pts'},{label:'500 pts'},{label:'100 pts'},{label:'£50 voucher'},
+      {label:'75 pts'},{label:'250 pts'},{label:'150 pts'},{label:'Mystery prize'}]
+  });
+
+  GG.scratchCard({ canvasId: 'ggScratchCanvasS', label: 'Scratch here', resetBtn: '[data-reset-s]' });
+
+  GG.slotMachine({
+    hostSel: '#ggReelsS', btnSel: '#ggSlotsBtnS', resultSel: '#ggSlotsResultS',
+    prizes: {key:'50 pts', star:'150 pts', trophy:'£20 voucher'}
+  });
+
+  GG.matchThree({
+    hostSel: '#ggMatchGridS', resultSel: '#ggMatchResultS',
+    prize: {label:'250 pts'}
+  });
+
+  GG.unlockBadges({
+    hostSel: '#ggBadgesS', completeSel: '#ggBadgeCompleteS',
+    completionText: 'All four unlocked — bonus prize applied on top of your module points.',
+    modules: [
+      {name:'Range', prize:'30 pts'}, {name:'Charging', prize:'30 pts'},
+      {name:'Assisted Driving', prize:'30 pts'}, {name:'Handover', prize:'30 pts'}
+    ]
+  });
+
+  GG.quizUnlock({
+    hostSel: '#ggQuizOptsS', questionSel: '#ggQuizQS', resultSel: '#ggQuizResultS',
+    question: {
+      text: 'Which of these earns points on this programme?',
+      options: ['A completed test drive', 'A cancelled booking', 'A missed appointment', 'A duplicate enquiry'],
+      correctIndex: 0
+    },
+    prize: {label: '50 pts'}
+  });
+</script>
+</body>
+</html>

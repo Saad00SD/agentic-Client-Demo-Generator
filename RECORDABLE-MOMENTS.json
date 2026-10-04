@@ -1,0 +1,347 @@
+{
+  "build": "xpeng-vector",
+  "prospect": "XPENG UK",
+  "programmeName": "Vector",
+  "programmeNameStatus": "invented for this build, no trademark check. Names the journey and the test drive, which is the behaviour the programme pays for.",
+  "generated": "2026-08-31",
+  "viewport": {
+    "width": 1440,
+    "height": 900
+  },
+  "resetBeforeRecording": {
+    "url": "?reset=1",
+    "keyboard": "Shift+0",
+    "clears": [
+      "drill-down level",
+      "scroll position"
+    ],
+    "note": "This build is English only, so there is no language to clear. There is no login, no cookie banner and no first-run state."
+  },
+  "conventions": {
+    "selector": "Every moment targets a data-rm attribute, which is stable across content changes and does not depend on class names or text.",
+    "dwell": "Seconds the frame should hold once the target is on screen and settled.",
+    "settle": "Milliseconds to wait after navigation before capture. The build has no loading states; this is animation settle only.",
+    "scroll": "true where the target is below the fold at the stated viewport."
+  },
+  "personas": {
+    "leadership": "programme adoption, regional visibility, management insight",
+    "sales": "campaigns, individual performance, leaderboard, target achievement",
+    "network": "retailer onboarding, adoption, engagement, region and retailer drill-down",
+    "marketing": "campaign activation, participant engagement, recognition",
+    "distributor": "network activation, conversion, retailer performance against target"
+  },
+  "moments": [
+    {
+      "id": "RM01",
+      "name": "Personalised participant home",
+      "page": "index.html",
+      "purpose": "Establish that this is the prospect's own branded programme, not a generic product tour.",
+      "visual": "XPENG mark and VECTOR wordmark in the black chrome, showroom hero, the participant’s name and points balance top right, five campaign cards below.",
+      "personas": [
+        "sales",
+        "aftersales",
+        "marketing"
+      ],
+      "navigation": [
+        {
+          "action": "goto",
+          "target": "index.html?reset=1"
+        }
+      ],
+      "selector": "[data-rm=\"rm-home-hero\"]",
+      "dwell": 6,
+      "settle": 700,
+      "scroll": false,
+      "strength": "high",
+      "note": "The strongest opening frame. Branding lands before a word is spoken."
+    },
+    {
+      "id": "RM02",
+      "name": "Test Drive ladder in progress",
+      "page": "first-time-fix.html",
+      "purpose": "Show a campaign that is live, personal and mid-flight rather than a static description.",
+      "visual": "Three bands, a marker sitting between Qualify and Accelerate labelled “You are here with 14 drives”, rates per band above.",
+      "personas": [
+        "sales",
+        "aftersales"
+      ],
+      "navigation": [
+        {
+          "action": "goto",
+          "target": "first-time-fix.html"
+        }
+      ],
+      "selector": "[data-rm=\"rm-ftf-ladder\"]",
+      "dwell": 7,
+      "settle": 600,
+      "scroll": true,
+      "strength": "high",
+      "note": "The “two drives from the next band” nudge above it does the persuading. Hold long enough to read it."
+    },
+    {
+      "id": "RM03",
+      "name": "Individual leaderboard",
+      "page": "service-league.html",
+      "purpose": "Show ranking by name, with movement and a closable gap. The most motivational screen in the build.",
+      "visual": "Ten named participants with retailer, points, gap to next, previous rank and movement arrows. Dan Whitfield highlighted at 6th, up three.",
+      "personas": [
+        "sales",
+        "aftersales",
+        "marketing"
+      ],
+      "navigation": [
+        {
+          "action": "goto",
+          "target": "service-league.html"
+        }
+      ],
+      "selector": "[data-rm=\"rm-league-individual\"]",
+      "dwell": 8,
+      "settle": 600,
+      "scroll": true,
+      "strength": "high",
+      "note": "Individual is the default tab. The “Closing the gap” panel to the right is the second half of this moment."
+    },
+    {
+      "id": "RM04",
+      "name": "Network onboarding against target",
+      "page": "network.html",
+      "purpose": "Answer the first question a distributor asks: did the retailer network actually join?",
+      "visual": "Target 640 / invited 606 / registered 478 / active 394, with 75% registration against target and 82% active against registered.",
+      "personas": [
+        "leadership",
+        "network",
+        "distributor"
+      ],
+      "navigation": [
+        {
+          "action": "goto",
+          "target": "network.html?reset=1"
+        }
+      ],
+      "selector": "[data-rm=\"rm-onboarding-funnel\"]",
+      "dwell": 7,
+      "settle": 700,
+      "scroll": false,
+      "strength": "high",
+      "note": "Reads in about three seconds. The single best frame for a distributor or network recipient."
+    },
+    {
+      "id": "RM05",
+      "name": "Region drill-down, national to a region",
+      "page": "network.html",
+      "purpose": "Show that adoption is visible per region, and that two regions are visibly behind.",
+      "visual": "Seven region rows, green for the South East and North West, red for the South West and Wales & West, one click into the South East.",
+      "personas": [
+        "leadership",
+        "network",
+        "distributor"
+      ],
+      "navigation": [
+        {
+          "action": "goto",
+          "target": "network.html?reset=1"
+        },
+        {
+          "action": "hold",
+          "ms": 1600
+        },
+        {
+          "action": "click",
+          "selector": "[data-drill=\"South%20East\"]"
+        }
+      ],
+      "selector": "[data-rm=\"rm-drill-table\"]",
+      "dwell": 7,
+      "settle": 500,
+      "scroll": false,
+      "strength": "high",
+      "note": "The colour spread is the point. Hold on the region list before clicking. Every level change resets scroll to 0."
+    },
+    {
+      "id": "RM06",
+      "name": "Retailer to individual",
+      "page": "network.html",
+      "purpose": "Show the bottom of the hierarchy: the same platform, two levels further down.",
+      "visual": "Breadcrumb reading United Kingdom › South East › XPENG Guildford › Dan Whitfield, then his performance by campaign with targets and achievement percentages.",
+      "personas": [
+        "leadership",
+        "network",
+        "distributor"
+      ],
+      "navigation": [
+        {
+          "action": "goto",
+          "target": "network.html#South%20East/XPENG%20Guildford"
+        },
+        {
+          "action": "hold",
+          "ms": 1400
+        },
+        {
+          "action": "click",
+          "selector": "[data-drill=\"South%20East/XPENG%20Guildford/XP-GLD-04\"]"
+        }
+      ],
+      "selector": "[data-rm=\"rm-person-view\"]",
+      "dwell": 8,
+      "settle": 600,
+      "scroll": false,
+      "strength": "high",
+      "note": "Deep-linked to the retailer level so the take starts one click from the payoff. The breadcrumb is what sells the hierarchy."
+    },
+    {
+      "id": "RM07",
+      "name": "Reward shop",
+      "page": "shop.html",
+      "purpose": "Show that the points are spendable on things people actually want, with real catalogue artwork.",
+      "visual": "Signature tier above, then the gift card grid with brand artwork and points prices.",
+      "personas": [
+        "sales",
+        "aftersales",
+        "marketing"
+      ],
+      "navigation": [
+        {
+          "action": "goto",
+          "target": "shop.html"
+        }
+      ],
+      "selector": "[data-rm=\"rm-shop-grid\"]",
+      "dwell": 5,
+      "settle": 700,
+      "scroll": true,
+      "strength": "medium",
+      "note": "Useful but not differentiating. Cut this before cutting anything else."
+    },
+    {
+      "id": "RM08",
+      "name": "Programme dashboard",
+      "page": "dashboard.html",
+      "purpose": "Show central management: adoption band, KPI tiles, activation by market, campaign health.",
+      "visual": "The dark adoption band across the top, four KPI tiles, seven region activation bars, three campaign donuts.",
+      "personas": [
+        "leadership",
+        "network",
+        "marketing"
+      ],
+      "navigation": [
+        {
+          "action": "goto",
+          "target": "dashboard.html?reset=1"
+        }
+      ],
+      "selector": "[data-rm=\"rm-dash-adoption\"]",
+      "dwell": 6,
+      "settle": 700,
+      "scroll": false,
+      "strength": "high",
+      "note": "Pairs naturally with RM04. Use one or the other in a single teaser, not both."
+    },
+    {
+      "id": "RM10",
+      "name": "Demonstrator availability gauge",
+      "page": "next-service-booked.html",
+      "purpose": "Show a different mechanism, so the programme does not read as one incentive repeated five times.",
+      "visual": "62% against a 55% threshold and a 47% network average, all three marked on one bar.",
+      "personas": [
+        "distributor",
+        "sales"
+      ],
+      "navigation": [
+        {
+          "action": "goto",
+          "target": "next-service-booked.html"
+        }
+      ],
+      "selector": "[data-rm=\"rm-nsb-gauge\"]",
+      "dwell": 6,
+      "settle": 600,
+      "scroll": true,
+      "strength": "medium",
+      "note": "Strongest for a distributor recipient, because demonstrator utilisation is a cost they carry."
+    },
+    {
+      "id": "RM11",
+      "name": "Prepared answer",
+      "page": "sherbot.html",
+      "purpose": "Show that the programme office can ask a question rather than request a report.",
+      "visual": "The question, a written answer, and a table of retailers within reach of their next band.",
+      "personas": [
+        "leadership",
+        "marketing"
+      ],
+      "navigation": [
+        {
+          "action": "goto",
+          "target": "sherbot.html?reset=1"
+        },
+        {
+          "action": "click",
+          "selector": "[data-prefill]"
+        }
+      ],
+      "selector": "[data-rm=\"rm-sherbot-answer\"]",
+      "dwell": 7,
+      "settle": 600,
+      "scroll": false,
+      "strength": "medium",
+      "note": "Do not say “AI” over this. The screen speaks for itself and the word invites scepticism from a commercial buyer."
+    },
+    {
+      "id": "RM12",
+      "name": "Product certification",
+      "page": "ev-service-ready.html",
+      "purpose": "Show the campaign that matches a network selling an unfamiliar brand: people who can sell a car but cannot yet explain this one.",
+      "visual": "Four modules with progress, three complete and one open, the completion award named beside them.",
+      "personas": [
+        "sales",
+        "network"
+      ],
+      "navigation": [
+        {
+          "action": "goto",
+          "target": "ev-service-ready.html"
+        }
+      ],
+      "selector": "[data-rm=\"rm-cert-modules\"]",
+      "dwell": 6,
+      "settle": 600,
+      "scroll": true,
+      "strength": "high",
+      "note": "Strongest campaign for a brand in its first years in a market."
+    }
+  ],
+  "suggestedTeasers": {
+    "note": "45 to 60 seconds, two or three moments only. Everything else is what the live meeting is for.",
+    "distributor": [
+      "RM01",
+      "RM04",
+      "RM06"
+    ],
+    "leadership": [
+      "RM01",
+      "RM04",
+      "RM06"
+    ],
+    "network": [
+      "RM01",
+      "RM05",
+      "RM04"
+    ],
+    "sales": [
+      "RM01",
+      "RM03",
+      "RM02"
+    ],
+    "marketing": [
+      "RM01",
+      "RM03",
+      "RM08"
+    ]
+  },
+  "doNotRecord": {
+    "commercial.html": "Pilot and Scale and Commercial Model are built and reachable. The UK opportunity is at appointment stage, not proposal, so the commercial architecture stays off camera until somebody asks for it.",
+    "help.html": "A placeholder in this build, deliberately not populated with invented content."
+  }
+}

@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XPENG Vector — SherBot</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="assets/favicon.png" type="image/png">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<div id="chrome"></div>
+
+<div class="sb">
+  <div class="admin-top">
+    <div class="admin-top-in">
+      <h1>Sher<span>Bot</span></h1>
+      <span class="chip">Instance <select aria-label="Instance"><option>XPENG_Vector_EU1</option></select></span>
+      <a class="mini" href="dashboard.html" style="text-decoration:none">← Back to dashboard</a>
+      <span class="illus"><i></i>Illustrative concept output</span>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="sb-grid">
+
+      <!-- left: threads + saved reviews -->
+      <div class="sb-col">
+        <h4>Threads</h4>
+        <button class="sb-item" style="width:100%;justify-content:center;background:var(--black);color:#fff;border-color:var(--black)">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" style="color:#fff"><path d="M8 3v10M3 8h10"/></svg>
+          New question
+        </button>
+        <div style="font-size:12px;color:var(--text-faint);padding:14px 2px 6px">No saved threads in this
+          demonstration.</div>
+        <h4 style="margin-top:20px">Train SherBot</h4>
+        <div class="sb-item">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 2l6 3-6 3-6-3z"/><path d="M4 7v3.5c0 1 1.8 2 4 2s4-1 4-2V7"/></svg>
+          Manage training set
+        </div>
+      </div>
+
+      <!-- centre: the conversation -->
+      <div class="sb-main">
+        <div class="sb-srcs" id="sbSrcs"></div>
+
+        <div class="sb-body" id="sbBody" data-rm="rm-sherbot-answer">
+          <div class="sb-empty">
+            <svg class="brain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+              <path d="M9 3a3 3 0 00-3 3 3 3 0 00-2 5.2A3 3 0 006 16a3 3 0 003 3 2.5 2.5 0 003-2.4V5.4A2.5 2.5 0 009 3z"/>
+              <path d="M15 3a3 3 0 013 3 3 3 0 012 5.2A3 3 0 0118 16a3 3 0 01-3 3"/></svg>
+            <h3>Meet SherBot, your AI analyst</h3>
+            <p>SherBot answers questions about your programme data in plain language. Ask a business
+              question to start, or use the prepared question below.</p>
+            <button class="btn btn-blue" data-prefill style="margin-top:18px">Use the prepared question</button>
+          </div>
+        </div>
+
+        <div class="sb-modes">
+          <span class="pill on">Quick Search</span>
+          <span class="pill">Deep Analysis</span>
+          <span style="flex:1"></span>
+          <span class="mini">Generate report</span>
+          <span class="mini">Analyze</span>
+          <span class="mini">Predict</span>
+        </div>
+
+        <form class="sb-ask" id="sbForm">
+          <input id="sbInput" type="text" placeholder="Ask a business question about your data…"
+                 aria-label="Ask a question" autocomplete="off">
+          <button class="sb-send" type="submit" aria-label="Send">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M2 8h11M9 4l4 4-4 4"/></svg>
+          </button>
+        </form>
+      </div>
+
+      <!-- right: saved reviews + schema -->
+      <div class="sb-col">
+        <h4>Saved reviews</h4>
+        <div id="sbSaved"></div>
+        <h4 style="margin-top:22px">Database schema</h4>
+        <div class="sb-item">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="8" cy="3.6" rx="5.4" ry="2.2"/><path d="M2.6 3.6v8.8c0 1.2 2.4 2.2 5.4 2.2s5.4-1 5.4-2.2V3.6"/><path d="M2.6 8c0 1.2 2.4 2.2 5.4 2.2s5.4-1 5.4-2.2"/></svg>
+          Accounts</div>
+        <div class="sb-item">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="8" cy="3.6" rx="5.4" ry="2.2"/><path d="M2.6 3.6v8.8c0 1.2 2.4 2.2 5.4 2.2s5.4-1 5.4-2.2V3.6"/><path d="M2.6 8c0 1.2 2.4 2.2 5.4 2.2s5.4-1 5.4-2.2"/></svg>
+          Retailers</div>
+        <div class="sb-item">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="8" cy="3.6" rx="5.4" ry="2.2"/><path d="M2.6 3.6v8.8c0 1.2 2.4 2.2 5.4 2.2s5.4-1 5.4-2.2V3.6"/><path d="M2.6 8c0 1.2 2.4 2.2 5.4 2.2s5.4-1 5.4-2.2"/></svg>
+          Regions</div>
+        <div class="sb-item">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="8" cy="3.6" rx="5.4" ry="2.2"/><path d="M2.6 3.6v8.8c0 1.2 2.4 2.2 5.4 2.2s5.4-1 5.4-2.2V3.6"/><path d="M2.6 8c0 1.2 2.4 2.2 5.4 2.2s5.4-1 5.4-2.2"/></svg>
+          Campaign activity</div>
+      </div>
+
+    </div>
+
+    <p class="illus-note" style="padding-bottom:34px;max-width:82ch">
+      <b style="color:var(--text)">A note on this screen.</b> The SherBot interface is evidenced in the source
+      material: the connected data sources, the two query modes, the three actions, the saved reviews and the
+      schema browser all exist in the live platform. The answer produced by the prepared question in this
+      demonstration is written illustrative content showing the shape of a reply. It is not generated by a
+      live model and does not describe any real account.
+    </p>
+  </div>
+</div>
+
+<div id="foot"></div>
+<div id="modalHost" class="modal"></div>
+
+<script src="assets/data.js"></script>
+<script src="assets/i18n-core.js"></script>
+<script src="assets/i18n-build.js"></script>
+<script src="assets/app.js"></script>
+<script>
+  boot('AI Analytic', {admin:true});
+  const S = DEMO.sherbot;
+  document.getElementById('sbSrcs').innerHTML =
+    S.sources.map(s=>`<span class="sb-src"><i></i>${s}</span>`).join('');
+  document.getElementById('sbSaved').innerHTML = S.saved.map(s=>`
+    <div class="sb-item">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6">
+        <rect x="2.5" y="2" width="11" height="12" rx="1.4"/><path d="M2.5 6h11M6 6v8"/></svg>
+      ${s}</div>`).join('');
+</script>
+</body>
+</html>

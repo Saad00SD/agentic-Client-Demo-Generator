@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XPENG Vector — Shop</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="assets/favicon.png" type="image/png">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<div id="chrome"></div>
+
+<section class="hero">
+  <div class="hero-media"><img src="assets/img/xpeng-china-track-day.jpg" alt=""></div>
+  <div class="hero-in">
+    <div>
+      <h1>XPENG Vector <em>Shop</em></h1>
+      <p class="hero-lede">One point is one pound. Spend it on anything here, with nothing ring-fenced.</p>
+    </div>
+    <div class="carousel" data-carousel>
+      <div class="slide on">
+        <div class="slide-kv"><img src="assets/img/xpeng-china-production-milestone.jpg" alt=""></div>
+        <div class="slide-copy">
+          <h3>Today's top pick</h3>
+          <p>The signature tier opens at 250 points. A track day for two, or a place on the brand home visit.</p>
+          <span class="btn">Learn more</span>
+        </div>
+      </div>
+      <div class="dots"><button class="on" aria-label="Featured"></button></div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap section">
+  <div class="split-side">
+
+    <!-- filter sidebar (evidenced) -->
+    <aside class="panel" style="align-self:start">
+      <div class="searchbox" style="max-width:none;margin-bottom:20px">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7">
+          <circle cx="7" cy="7" r="5"/><path d="M11 11l4 4"/></svg>
+        <input type="search" placeholder="Search rewards" aria-label="Search rewards">
+      </div>
+
+      <div class="panel-label">Popular filters</div>
+      <label style="display:block;font-size:13px;margin-bottom:9px"><input type="checkbox" checked> Signature</label>
+      <label style="display:block;font-size:13px;margin-bottom:9px"><input type="checkbox" checked> Training</label>
+      <label style="display:block;font-size:13px;margin-bottom:9px"><input type="checkbox"> Travel</label>
+      <label style="display:block;font-size:13px;margin-bottom:9px"><input type="checkbox"> Dining</label>
+      <label style="display:block;font-size:13px;margin-bottom:9px"><input type="checkbox"> Team days &amp; experiences</label>
+
+      <div class="panel-label" style="margin-top:24px">Points range</div>
+      <input type="range" min="10" max="2000" value="600" style="width:100%" aria-label="Points range">
+      <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--text-dim)">
+        <span>10</span><span>2,000</span></div>
+
+      <div class="panel-label" style="margin-top:24px">Your points budget</div>
+      <label style="display:block;font-size:13px;margin-bottom:9px"><input type="checkbox"> Less than 250</label>
+      <label style="display:block;font-size:13px;margin-bottom:9px"><input type="checkbox" checked> 250 to 1,000</label>
+      <label style="display:block;font-size:13px;margin-bottom:9px"><input type="checkbox"> More than 1,000</label>
+
+      <div style="margin-top:22px"><span class="illus"><i></i>Illustrative catalogue</span></div>
+    </aside>
+
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap">
+        <h2 class="h-sec">Signature tier</h2>
+        <span class="sub" id="shopBal"></span>
+      </div>
+      <p class="sub" style="margin:0 0 20px">The top of the catalogue, on the same balance as everything else</p>
+      <div class="rw-grid" id="shopSig"></div>
+
+      <h2 class="h-sec" style="margin:34px 0 4px">Popular choices</h2>
+      <p class="sub" style="margin-bottom:20px">For you, and for the people who put up with your month end</p>
+      <div class="rw-grid" id="shopGrid" data-rm="rm-shop-grid"></div>
+
+      <h2 class="h-sec" style="margin:34px 0 4px">Team days and experiences</h2>
+      <p class="sub" style="margin-bottom:20px">The tier that takes the whole team somewhere, built over a full year</p>
+      <div class="rw-grid" id="shopExp"></div>
+
+      <p class="illus-note">A representative selection from the live catalogue. Your whole balance is spendable
+        in any category, with nothing ring-fenced and no annual limit on a category. Every item can be taken
+        in any category. There is no cash-out route on this programme.</p>
+    </div>
+
+  </div>
+</div>
+
+<div id="foot"></div>
+<div id="modalHost" class="modal"></div>
+
+<script src="assets/config.js"></script>
+<script src="assets/i18n.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/i18n-core.js"></script>
+<script src="assets/i18n-build.js"></script>
+<script src="assets/app.js"></script>
+<script>
+  renderRewards('shopSig', {list: DEMO.signature});
+  renderRewards('shopGrid',  {list: DEMO.rewards, credit:false});
+  renderRewards('shopExp',   {list: DEMO.experiences, credit:false});
+  boot('Shop');
+  document.getElementById('shopBal').textContent =
+    'You have ' + pts(DEMO.points.balance) + ' points (' + ptsToCur(DEMO.points.balance) + ') to spend';
+</script>
+</body>
+</html>

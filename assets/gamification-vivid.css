@@ -1,0 +1,110 @@
+/* ============================================================
+   Gamification — vivid skin (XPENG Vector only)
+   Loads AFTER gamification.css and only on this build, so the
+   shared module stays untouched for the other demo builds.
+   Matches the campaign key visual language: gold, magenta,
+   purple and citrus on a bold field.
+   ============================================================ */
+
+:root{
+  --gg-gold:#FFD24C; --gg-gold-dk:#C98A00; --gg-magenta:#C0257F;
+  --gg-purple:#5B1FA8; --gg-coral:#FF3E6C; --gg-deep:#1A0B3A;
+}
+
+/* ---------------- layout: art + title on the left, game on the right ---------------- */
+.gg-showcase .rail-head{display:none}
+.gg-showcase .gg-game-body{grid-template-columns:minmax(0,.9fr) minmax(0,1fr);gap:30px;align-items:stretch}
+
+.gg-banner{position:relative;border-radius:18px;overflow:hidden;min-height:300px;
+  background-size:cover;background-position:right center;background-repeat:no-repeat;
+  box-shadow:0 16px 38px rgba(26,11,58,.28);
+  display:flex;flex-direction:column;justify-content:center;padding:34px 36px}
+.gg-banner::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(96deg,rgba(12,6,28,.9) 0%,rgba(12,6,28,.72) 36%,
+    rgba(12,6,28,.18) 68%,transparent 84%)}
+.gg-banner-txt{position:relative;z-index:2;max-width:23ch}
+.gg-banner-txt .h-sec{color:#fff;margin:0 0 10px;text-shadow:0 3px 14px rgba(0,0,0,.45)}
+.gg-banner-txt .sub{color:rgba(255,255,255,.9);margin:0;font-size:14px;line-height:1.5;
+  text-shadow:0 2px 10px rgba(0,0,0,.45)}
+.gg-banner .illus{position:absolute;top:18px;right:18px;z-index:2;
+  border-color:rgba(255,255,255,.55);color:#fff;background:rgba(12,6,28,.44)}
+.gg-banner .illus i{background:var(--gg-gold)}
+@media (max-width:860px){
+  .gg-showcase .gg-game-body{grid-template-columns:1fr}
+  .gg-banner{min-height:190px;padding:24px 26px}
+  .gg-banner-txt{max-width:none}
+}
+
+/* ---------------- shared game furniture ---------------- */
+button.gg-spin-btn{
+  background:linear-gradient(100deg,#FFF6D6 0%,var(--gg-gold) 34%,var(--gg-gold-dk) 62%,var(--gg-gold) 100%);
+  color:var(--gg-deep);font-weight:800;box-shadow:0 10px 24px rgba(201,138,0,.45)}
+button.gg-spin-btn:not(:disabled):hover{
+  background:linear-gradient(100deg,#FFF6D6,var(--gg-gold) 46%,#FFB020);
+  box-shadow:0 12px 30px rgba(201,138,0,.55)}
+
+.gg-result.show,.gg-badge-complete.show{
+  background:linear-gradient(110deg,var(--gg-gold),#FFB020);
+  color:var(--gg-deep);box-shadow:0 12px 30px rgba(201,138,0,.45)}
+.gg-result.show::before,.gg-badge-complete.show::before{background:var(--gg-deep)}
+.gg-result,.gg-badge-complete{color:var(--gg-magenta)}
+
+/* ---------------- Spin & Win ---------------- */
+.gg-wheel{box-shadow:0 0 0 9px var(--gg-gold),0 0 0 12px rgba(255,210,76,.35),
+  0 18px 40px rgba(91,31,168,.35)}
+.gg-wheel-pointer{border-top-color:var(--gg-deep)}
+.gg-wheel-pointer::after{border-top-color:var(--gg-gold)}
+
+/* ---------------- Scratchcard ---------------- */
+.gg-scratch-card{border-color:transparent;
+  box-shadow:0 14px 30px rgba(26,11,58,.3),0 0 0 4px var(--gg-gold)}
+.gg-scratch-prize{background:linear-gradient(140deg,var(--gg-purple),var(--gg-magenta) 55%,#FF6B2C)}
+.gg-scratch-reset{border-color:rgba(192,37,127,.4);color:var(--gg-magenta);font-weight:700}
+.gg-scratch-reset:hover{border-color:var(--gg-magenta);background:rgba(192,37,127,.08);color:var(--gg-magenta)}
+
+/* ---------------- Match 3 ---------------- */
+.gg-match-back{background:linear-gradient(155deg,var(--gg-purple),var(--gg-magenta));
+  box-shadow:0 8px 18px rgba(91,31,168,.35)}
+.gg-match-back svg{color:rgba(255,255,255,.78)}
+.gg-match-front{background:linear-gradient(155deg,#fff,#EFE4FA);border-color:rgba(91,31,168,.2)}
+.gg-match-tile.gg-match-star .gg-match-front{
+  background:linear-gradient(150deg,#FFF3C4,var(--gg-gold) 52%,var(--gg-gold-dk));
+  box-shadow:0 10px 24px rgba(201,138,0,.45)}
+.gg-match-tile.gg-match-star .gg-match-front svg{color:var(--gg-deep)}
+
+/* ---------------- Unlock the Badges ---------------- */
+.gg-badge-ring{background:linear-gradient(155deg,#F4EEFB,#E3D7F5);border-color:rgba(91,31,168,.22)}
+.gg-badge-ring svg{color:rgba(91,31,168,.55)}
+.gg-badge-ring.gg-badge-done{
+  background:linear-gradient(150deg,#FFF3C4,var(--gg-gold) 50%,var(--gg-gold-dk));
+  box-shadow:0 10px 26px rgba(201,138,0,.5)}
+.gg-badge-ring.gg-badge-done svg{color:var(--gg-deep)}
+.gg-badge-ring.gg-badge-done + .gg-badge-name + .gg-badge-prize,
+.gg-badge.gg-badge-open .gg-badge-prize{color:var(--gg-magenta)}
+
+/* ---------------- Slots ---------------- */
+.gg-reels{background:linear-gradient(150deg,#2A0E3E,#12061F);
+  box-shadow:0 14px 30px rgba(26,11,58,.4),0 0 0 5px var(--gg-gold)}
+.gg-reel{background:linear-gradient(180deg,#fff,#EFE4FA);
+  box-shadow:inset 0 -8px 14px rgba(91,31,168,.12)}
+.gg-reel-cell svg{color:var(--gg-gold-dk)}
+
+/* ---------------- Quiz unlock ---------------- */
+.gg-quiz-opt{border-color:rgba(91,31,168,.22);border-radius:14px;font-weight:700}
+.gg-quiz-opt:hover:not(:disabled){border-color:var(--gg-magenta);background:rgba(192,37,127,.07)}
+.gg-quiz-opt.gg-quiz-correct{
+  background:linear-gradient(110deg,#FFF3C4,var(--gg-gold) 52%,var(--gg-gold-dk));
+  color:var(--gg-deep);box-shadow:0 10px 26px rgba(201,138,0,.45)}
+.gg-quiz-opt.gg-quiz-wrong{border-color:rgba(91,31,168,.18);background:#F4EEFB}
+.gg-quiz-q{color:var(--gg-deep)}
+
+/* The wheel paints its segments from --blue/--citrus/--blue-70/--blue-30, so
+   rescoping those four on the wheel alone recolours it without touching the
+   shared module or anything else on the page. Segment labels are white, so
+   every value here is dark enough to carry white text. */
+.gg-panel .gg-wheel{
+  --blue:#7B2FD0;
+  --citrus:#00A992;
+  --blue-70:#C0257F;
+  --blue-30:#C97A00;
+}

@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XPENG Vector — Points Bank</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="assets/favicon.png" type="image/png">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<div id="chrome"></div>
+
+<!-- ============ POINTS BANK (Équipe My Statement) ============ -->
+<section class="pb-hero">
+  <h1>My Statement</h1>
+  <p>Earn and spend your rewards</p>
+</section>
+<div class="crumb"><div class="crumb-in">
+  <a href="index.html">Home</a> &nbsp;›&nbsp; My Statement
+</div></div>
+
+<div class="wrap section">
+  <div class="panel">
+
+    <div class="ltabs" data-ltabs>
+      <button class="on" data-ltab="stmt">Statement</button>
+      <button data-ltab="spend">Spend on Experiences</button>
+      <button data-ltab="fav">My Favourites</button>
+    </div>
+
+    <!-- ---------------- STATEMENT ---------------- -->
+    <div data-lpane="stmt" class="on">
+      <div class="balhead">
+        <div>
+          <h2 class="h-sec">Balance &amp; Transactions</h2>
+          <p class="sub" style="margin:0">Account <span id="pbAcct"></span> · <span id="pbBiz"></span></p>
+        </div>
+        <div style="text-align:right">
+          <div class="sub" style="margin:0">Available to spend as at <span id="pbAsOf"></span></div>
+          <div class="big"><span id="pbPts"></span> <span style="font-size:16px;font-weight:600;color:var(--text-dim)">points</span></div>
+          <div class="sub" style="margin:0" id="pbGbp"></div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center;margin-bottom:18px">
+        <div class="searchbox">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7">
+            <circle cx="7" cy="7" r="5"/><path d="M11 11l4 4"/></svg>
+          <input id="ledSearch" type="search" placeholder="Search transactions" aria-label="Search transactions">
+        </div>
+        <span class="illus"><i></i>Illustrative data</span>
+      </div>
+
+      <div class="split">
+        <div>
+          <table class="led" data-rm="rm-points-ledger">
+            <thead><tr><th>Transaction</th><th>Points</th></tr></thead>
+            <tbody id="ledBody"></tbody>
+          </table>
+
+          <p class="illus-note">Every line names the campaign it came from. Demonstration data
+            for XPENG Guildford.</p>
+        </div>
+
+        <aside class="rail">
+          <div class="rail-dark">
+            <div class="rail-h">Where your points go</div>
+            <div style="border:1px solid rgba(255,255,255,.2);border-radius:9px;padding:14px;margin-bottom:10px">
+              <div style="font-weight:700;font-size:14px;color:var(--citrus);margin-bottom:5px">Spend in the shop</div>
+              <div style="font-size:12.5px;color:var(--on-dark-dim)">Gift cards, dining, travel, experiences and the signature tier.</div>
+              <a class="btn" style="margin-top:11px;font-size:12.5px;padding:8px 14px" href="shop.html">Browse the shop</a>
+            </div>
+            <div style="border:1px solid rgba(255,255,255,.2);border-radius:9px;padding:14px">
+              <div style="font-weight:700;font-size:14px;color:var(--citrus);margin-bottom:5px">One route, deliberately</div>
+              <div style="font-size:12.5px;color:var(--on-dark-dim)">Points are spent in the shop and nowhere else.
+                Nothing runs through your employer's payroll, which is what keeps the programme quick to pay
+                and simple for the site to administer.</div>
+              <a class="btn btn-blue" style="margin-top:11px;font-size:12.5px;padding:8px 14px" href="voucher-wallet.html">See your wallet</a>
+            </div>
+          </div>
+          <div class="rail-photo"><img src="assets/img/showroom-desk.jpg" alt=""></div>
+        </aside>
+      </div>
+    </div>
+
+    <!-- ---------------- SPEND ON EXPERIENCES ---------------- -->
+    <div data-lpane="spend">
+      <h2 class="h-sec" style="margin-bottom:4px">Spend on experiences</h2>
+      <p class="sub" style="margin-bottom:22px">The aspirational tier, for balances built over a full year</p>
+      <div class="rw-grid" id="expGrid"></div>
+      <p class="illus-note">Catalogue content is representative. The live shop carries the full range.</p>
+    </div>
+
+    <!-- ---------------- FAVOURITES ---------------- -->
+    <div data-lpane="fav">
+      <h2 class="h-sec" style="margin-bottom:4px">My favourites</h2>
+      <p class="sub" style="margin-bottom:22px">Saved for quick redemption</p>
+      <div class="rw-grid" id="favGrid"></div>
+    </div>
+
+  </div>
+</div>
+
+<div id="foot"></div>
+<div id="modalHost" class="modal"></div>
+
+<script src="assets/config.js"></script>
+<script src="assets/i18n.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/i18n-core.js"></script>
+<script src="assets/i18n-build.js"></script>
+<script src="assets/app.js"></script>
+<script>
+  boot('Points Bank');
+  const c = DEMO.customer, P = DEMO.points;
+  document.getElementById('pbAcct').textContent = c.account;
+  document.getElementById('pbBiz').textContent  = c.business;
+  document.getElementById('pbAsOf').textContent = DEMO.asOf;
+  document.getElementById('pbPts').textContent  = pts(P.balance);
+  document.getElementById('pbGbp').textContent  = 'worth ' + ptsToCur(P.balance);
+
+  document.getElementById('ledBody').innerHTML = P.ledger.map(l=>{
+    const isCredit = false;
+    return `<tr${isCredit?' id="creditRow" style="cursor:pointer"':''}>
+      <td>
+        <div class="lab">${l.dir==='in'?'Points In':'Points Out'} — <a href="#" onclick="return false">${l.label}</a></div>
+        <div class="sub2">${l.date} · ${l.sub}</div>
+      </td>
+      <td>
+        <div class="amt ${l.dir}">${l.pts>0?'+':''}${pts(l.pts)}</div>
+        <div class="gbp">${ptsToCur(l.pts)}</div>
+      </td></tr>`;
+  }).join('');
+
+  renderRewards('expGrid', {list: DEMO.experiences, credit:false});
+  renderRewards('favGrid', {list: DEMO.rewards.filter(r =>
+    ['Amazon','Starbucks','Deutsche Bahn'].includes(r.n))});
+
+  wireLedger();   /* rebind after rows are written */
+</script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XPENG Vector — Network Intelligence</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="assets/favicon.png" type="image/png">
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/von.css">
+</head>
+<body>
+<div id="chrome"></div>
+
+<!-- ============ NETWORK INTELLIGENCE — COMING SOON ============
+     The management half of Voice of the Network. The participant side
+     captures a few seconds; this is what a few seconds becomes once there is
+     enough of it to aggregate.
+
+     Everything on this page is rendered by the shared master module from
+     DEMO.von.intelligence, except the framing copy, which is generic. No
+     XPENG-specific claim is authored here.
+
+     This capability is a concept. The COMING SOON badge is rendered by the
+     module itself and cannot be switched off in config.
+     ============================================================ -->
+<div class="admin">
+  <div class="admin-top">
+    <div class="admin-top-in">
+      <h1>Network <span>Intelligence</span></h1>
+      <span class="chip">Programme
+        <select aria-label="Programme"><option>XPENG Vector</option></select></span>
+      <span class="chip">Region
+        <select aria-label="Region">
+          <option>All regions</option><option>South East</option><option>North West</option>
+          <option>Midlands</option><option>Scotland</option><option>Yorkshire</option>
+          <option>South West</option><option>Wales & West</option>
+        </select></span>
+      <span class="chip">Campaign
+        <select aria-label="Campaign"><option>All campaigns</option>
+          <option>Test Drive</option><option>Order to Delivery</option>
+          <option>Product Certification</option><option>The Retailer League</option>
+          <option>Demonstrator Days</option></select></span>
+      <span class="chip">Period
+        <select aria-label="Period"><option>September 2026</option><option>Q3 2026</option></select></span>
+      <span class="illus"><i></i>Illustrative data</span>
+    </div>
+  </div>
+
+  <div class="wrap" style="padding-top:22px;padding-bottom:46px">
+
+    <p class="sub" style="max-width:82ch;margin:0 0 20px">
+      Your dashboard already knows what the network did and who did it. This is the layer that would
+      explain why: a few seconds of frontline feedback from the person who was in the showroom, transcribed,
+      structured and read against everything else the network has said this period.
+    </p>
+
+    <!-- rendered by assets/von.js from DEMO.von.intelligence -->
+    <div id="niPanel"></div>
+
+    <!-- what the signals are made of. Sums to the basis line in the panel above. -->
+    <div class="widget" style="margin-top:20px" data-rm="rm-ni-breakdown">
+      <div class="widget-h">
+        <h3>What the signals are</h3>
+        <!-- This block names Voice of the Network in its own footnote, so it
+             carries the badge itself. A section that names the capability
+             without saying Coming soon in the same frame is the one failure
+             that actually costs money: a prospect scrolling past this widget
+             must not be able to read the name without the status. -->
+        <div class="widget-tools">
+          <span class="mini" id="niTotal"></span>
+          <span class="von-soon"><i></i>Coming soon</span>
+        </div>
+      </div>
+      <div id="niBreakdown" style="padding:6px 0"></div>
+      <p class="illus-note">
+        Illustrative. Every figure on this page is demonstration data created for this walkthrough and
+        none of it is a real XPENG result. Voice of the Network is a proposed capability and is not
+        live functionality.
+      </p>
+    </div>
+
+    <!-- the strategic move, stated once -->
+    <div class="widget" style="margin-top:20px">
+      <div class="widget-h">
+        <h3>Where this sits</h3>
+        <!-- The middle column names Voice of the Network, so the badge sits
+             in this widget too rather than only at the top of the page. -->
+        <div class="widget-tools"><span class="von-soon"><i></i>Coming soon</span></div>
+      </div>
+      <div class="grid-3" style="gap:0;padding:6px 0 4px">
+        <div style="padding-right:26px;border-right:1px solid var(--line)">
+          <div class="panel-label">Sherbet today</div>
+          <div style="font-size:20px;font-weight:700;letter-spacing:-.015em;margin-top:8px">What happened</div>
+          <p class="sub" style="margin-top:6px">Adoption, participation and campaign results, reported accurately and on time.</p>
+        </div>
+        <div style="padding:0 26px;border-right:1px solid var(--line)">
+          <div class="panel-label" style="color:var(--blue)">With Voice of the Network</div>
+          <div style="font-size:20px;font-weight:700;letter-spacing:-.015em;margin-top:8px">Why it happened</div>
+          <p class="sub" style="margin-top:6px">The same numbers, with the network's own explanation of them attached.</p>
+        </div>
+        <div style="padding-left:26px">
+          <div class="panel-label">Where it goes</div>
+          <div style="font-size:20px;font-weight:700;letter-spacing:-.015em;margin-top:8px">What to do next</div>
+          <p class="sub" style="margin-top:6px">A recommendation evidenced by the network itself rather than by a consultant.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="foot"></div>
+<div id="modalHost" class="modal"></div>
+
+<script src="assets/config.js"></script>
+<script src="assets/i18n.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/i18n-core.js"></script>
+<script src="assets/i18n-build.js"></script>
+<script src="assets/von.js"></script>
+<script src="assets/app.js"></script>
+<script>
+  boot('Intelligence', {admin:true});
+
+  /* The breakdown is drawn here rather than in the module because it is a
+     standard measure-bar list, and the module has no business owning a
+     component the rest of the build already has. */
+  (function(){
+    const b = DEMO.von.intelligence.breakdown || [];
+    const total = b.reduce((a,r)=>a+r.v,0);
+    const max = b.reduce((a,r)=>Math.max(a,r.v),0) || 1;
+    document.getElementById('niTotal').textContent = pts(total) + ' signals';
+    document.getElementById('niBreakdown').innerHTML = b.map(r =>
+      `<div class="ni-row"><span class="l">${r.k}</span>`
+      + `<span class="t"><span style="width:${(r.v/max*100).toFixed(1)}%"></span></span>`
+      + `<span class="v">${pts(r.v)}</span></div>`).join('');
+  })();
+</script>
+</body>
+</html>

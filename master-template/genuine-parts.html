@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XPENG Vector — Order to Delivery</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="assets/favicon.png" type="image/png">
+<link rel="stylesheet" href="assets/app.css">
+<link rel="stylesheet" href="assets/gamification.css">
+<link rel="stylesheet" href="assets/gamification-vivid.css">
+</head>
+<body>
+<div id="chrome"></div>
+
+<section class="cam-hero">
+  <div class="cam-hero-in">
+    <div>
+      <span class="ctype"><i></i>Conversion Incentive</span>
+      <h1>Order to Delivery</h1>
+      <p class="cam-lede">Every order placed by a customer who drove the car first earns £25
+        in points. Conversion counts, not order value, so an L03 earns the same as an X9.
+        The national pot is capped, and once it is gone the campaign closes.</p>
+      <div class="cam-countdown"><b id="camDaysLeft"></b> days left in the period</div>
+    </div>
+    <div class="keyvis-wrap">
+      <div class="keyvis"><img src="assets/img/kv-order-to-delivery.jpg" alt="Order to Delivery campaign key visual"></div>
+    <nav class="cam-pager" aria-label="Move between campaigns">
+      <a class="cam-pager-link prev" href="first-time-fix.html"><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 2L4 8l6 6"/></svg><span><i>Previous</i><b>Test Drive</b></span></a>
+      <span class="cam-pager-count">2 / 5</span>
+      <a class="cam-pager-link next" href="ev-service-ready.html"><span><i>Next</i><b>Product Certification</b></span><svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 2l6 6-6 6"/></svg></a>
+    </nav>
+      <div class="keyvis-meta">September · order conversion</div>
+    </div>
+  </div>
+
+  <div class="nudge">
+    <div class="nudge-in nudge-dark">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" style="flex:0 0 auto">
+        <circle cx="8" cy="8" r="6.4"/><path d="M8 4.6v4M8 11.2v.2"/></svg>
+      <span><b>Pot update:</b> <span id="potMsg"></span></span>
+    </div>
+  </div>
+
+  <nav class="tabs"><div class="tabs-in" data-tabs>
+    <button class="on" data-tab="how">How to Participate</button>
+    <button data-tab="track">Tracker</button>
+    <button data-tab="tcs">T&amp;Cs</button>
+    <button data-tab="faq">FAQs</button>
+  </div></nav>
+</section>
+
+<div class="wrap section">
+
+  <!-- ---------------- HOW TO PARTICIPATE ---------------- -->
+  <div class="tabpane on" data-pane="how">
+    <div class="panel">
+      <div class="howto">
+        <div>
+          <h3>How to participate</h3>
+          <p>A customer who never drove the car is a customer somebody else will get. Order to Delivery
+          puts value behind every order that started with a drive, funded centrally by XPENG UK and
+          administered on the same platform as everything else.</p>
+          <p><b style="color:var(--text)">Here is how it works.</b></p>
+          <ul>
+            <li>The UK network converts a drive to an order on <span id="hBase"></span> of its drives. That is
+                the number to beat.</li>
+            <li>Every order from a customer who drove the car first earns <span id="hRate"></span> in points.</li>
+            <li>There is no cap on you. The cap is national.</li>
+            <li>The national pot is <span id="hPot"></span>. When it is dry, the campaign closes, whatever
+                the date.</li>
+          </ul>
+          <p>Points land within five working days of the order being delivered and are spent in the shop.</p>
+          <p style="font-size:12.4px;color:var(--text-faint)">Attribution rules are listed under T&amp;Cs.
+            The drive must be logged before the order is taken, not added to it afterwards.</p>
+        </div>
+        <div class="imgrid">
+          <div class="im"><img src="assets/img/showroom-desk.jpg" alt="" loading="lazy"></div>
+          <div class="im"><img src="assets/img/accessory-mat.jpg" alt="" loading="lazy"></div>
+          <div class="im"><img src="assets/img/accessory-boot.jpg" alt="" loading="lazy"></div>
+          <div class="im"><img src="assets/img/x9-studio.jpg" alt="" loading="lazy"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scratchcard — every qualifying order earns an instant reveal -->
+    <div class="panel gg-panel gg-showcase" id="campaignGame">
+      <div class="gg-game-body">
+        <div class="gg-banner" style="background-image:url(assets/img/gm-scratchcard.jpg)">
+          <span class="illus"><i></i>Illustrative</span>
+          <div class="gg-banner-txt">
+            <h2 class="h-sec">Scratchcard</h2>
+            <p class="sub">Every order from a customer who drove the car first earns a scratchcard. Reveal it instantly, on top of your points.</p>
+          </div>
+        </div>
+        <div class="gg-scratch-wrap">
+          <div class="gg-scratch-card">
+            <div class="gg-scratch-prize">£25 bonus in points</div>
+            <canvas class="gg-scratch-canvas" id="ggScratchCanvas" width="360" height="200"></canvas>
+          </div>
+          <p class="gg-hint">Drag or swipe across the card to scratch it off.</p>
+          <button class="gg-scratch-reset" data-reset>Reset card</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ---------------- TRACKER ---------------- -->
+  <div class="tabpane" data-pane="track">
+    <div class="pot" data-rm="rm-parts-pot">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap">
+        <div>
+          <h3>Order to Delivery · remaining national payout balance</h3>
+          <div class="upd">Updated <span id="potUpd"></span></div>
+        </div>
+        <span class="illus on-dark"><i></i>Illustrative data</span>
+      </div>
+
+      <div class="pot-in">
+        <div class="therm-col">
+          <div class="therm remaining" style="position:relative">
+            <div class="therm-scale" id="scale1"></div>
+            <div class="therm-fill" id="thermRem">
+              <div class="n" id="potRemN"></div>
+              <div class="c">Points remaining to win</div>
+            </div>
+          </div>
+        </div>
+        <div class="therm-col">
+          <div class="therm issued" style="position:relative">
+            <div class="therm-scale" id="scale2"></div>
+            <div class="therm-fill" id="thermIss">
+              <div class="n" id="potIssN"></div>
+              <div class="c">Points issued</div>
+            </div>
+          </div>
+        </div>
+        <div class="ptrack">
+          <div class="ptrack-h">Your performance tracker</div>
+          <table>
+            <thead><tr><th>Week</th><th>Orders from a drive</th><th>Reward earned</th></tr></thead>
+            <tbody id="fiRows"></tbody>
+            <tfoot><tr><td>Total</td><td id="fiCount"></td><td id="fiTotal"></td></tr></tfoot>
+          </table>
+        </div>
+      </div>
+
+      <p class="illus-note on-dark" style="margin-top:20px">
+        You are converting a drive to an order on <span id="vUnits"></span> of your drives against a national
+        average of <span id="vBase"></span>. Five drives, five orders, five rewards.
+      </p>
+    </div>
+
+    <div class="panel" style="margin-top:18px">
+      <h3 style="font-size:17px;margin-bottom:10px">Why the pot matters</h3>
+      <p class="sub" style="max-width:70ch">The pot is what XPENG UK has committed, and everyone on the
+        programme can see it. Campaigns are sized to the pot and can never award more than it holds, so the
+        funding cannot be overspent, and anything unspent carries forward rather than disappearing.</p>
+    </div>
+  </div>
+
+  <!-- ---------------- T&Cs ---------------- -->
+  <div class="tabpane" data-pane="tcs">
+    <div class="split">
+      <div class="panel">
+        <h2 class="h-sec" style="margin-bottom:18px">Terms &amp; Conditions</h2>
+
+        <div class="acc-row open">
+          <button class="acc-btn" aria-expanded="true">Programme period<i></i></button>
+          <div class="acc-body"><p>1 September 2026 to 30 September 2026, or until the national reward pot
+            is exhausted, whichever is sooner.</p></div>
+        </div>
+
+        <div class="acc-row">
+          <button class="acc-btn" aria-expanded="false">Qualifying orders and attribution<i></i></button>
+          <div class="acc-body">
+            <p>Only orders meeting every rule below count towards this campaign. Orders outside them do
+              not qualify and do not affect your conversion rate.</p>
+            <table>
+              <thead><tr><th>Rule</th><th>What it means</th></tr></thead>
+              <tbody id="partRows"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="acc-row">
+          <button class="acc-btn" aria-expanded="false">Conversion and reward<i></i></button>
+          <div class="acc-body">
+            <p>The network conversion rate shown is the average across all participating retailers in the UK
+              over the preceding period. It is published so everyone can see the number they are being measured
+              against, and it is not adjusted mid-period.</p>
+            <p>A reward of 25 points, worth £25 to a UK participant, is issued for each qualifying order with a
+              completed drive attached, in the order in which invoices are confirmed across the UK, until the
+              pot of 120,000 points is exhausted. The pot is held in points because a point is worth one
+              unit of local currency in whichever market it is spent.</p>
+          </div>
+        </div>
+
+        <div class="acc-row">
+          <button class="acc-btn" aria-expanded="false">Excluded orders<i></i></button>
+          <div class="acc-body">
+            <p>This campaign is open to orders taken by an enrolled individual at a participating XPENG retail
+              retailer. Staff and family drives, demonstrator movements and drives logged without a
+            named prospect are excluded from both the conversion rate and the reward calculation.</p>
+          </div>
+        </div>
+
+        <div class="acc-row">
+          <button class="acc-btn" aria-expanded="false">Clawback<i></i></button>
+          <div class="acc-body">
+            <p>XPENG UK reserves the right to withhold or reclaim any reward where there are reasonable
+              grounds to suspect manipulation, including but not limited to parts added to an invoice and
+              credited afterwards, or an order backdated onto a drive that never happened. Rewards reclaimed are
+              deducted from the individual's points balance.</p>
+          </div>
+        </div>
+
+        <div class="acc-row">
+          <button class="acc-btn" aria-expanded="false">Data<i></i></button>
+          <div class="acc-body"><p>Two sources confirm a qualifying order: the sales manager attributes it
+            to an individual, and the sales system confirms the parts line on the same invoice.
+            Nothing is paid until both agree.</p></div>
+        </div>
+
+        <p class="illus-note">Illustrative demonstration copy. Every figure, rule and retailer on this
+          screen is invented for the purposes of this demonstration.</p>
+      </div>
+      <aside class="rail">
+        <div class="rail-photo" style="aspect-ratio:3/4"><img src="assets/img/drive-handover.jpg" alt=""></div>
+      </aside>
+    </div>
+  </div>
+
+  <!-- ---------------- FAQs ---------------- -->
+  <div class="tabpane" data-pane="faq">
+    <div class="panel">
+      <h2 class="h-sec" style="margin-bottom:18px">Frequently asked questions</h2>
+      <div class="acc-row open">
+        <button class="acc-btn" aria-expanded="true">What happens when the pot runs out?<i></i></button>
+        <div class="acc-body"><p>The campaign closes and the tracker shows a zero remaining balance. Rewards
+          already earned are unaffected and are paid as normal.</p></div>
+      </div>
+      <div class="acc-row">
+        <button class="acc-btn" aria-expanded="false">Does this count towards Test Drive?<i></i></button>
+        <div class="acc-body"><p>Yes. An order can earn here and the drive behind it counts towards your monthly ladder at the same
+          time. The campaigns stack.</p></div>
+      </div>
+      <div class="acc-row">
+        <button class="acc-btn" aria-expanded="false">Why is the network rate the benchmark?<i></i></button>
+        <div class="acc-body"><p>It is the number the whole network is judged on, so it is published rather
+          than held centrally. Your band targets, by contrast, come from your own history, so a bigger site
+          does not get an easier target.</p></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div id="foot"></div>
+<div id="modalHost" class="modal"></div>
+
+<script src="assets/config.js"></script>
+<script src="assets/i18n.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/i18n-core.js"></script>
+<script src="assets/i18n-build.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/gamification.js"></script>
+<script>
+  boot('Campaigns');
+  document.getElementById('camDaysLeft').textContent = DEMO.daysLeft;
+  GG.scratchCard({ canvasId: 'ggScratchCanvas', label: 'Scratch here', resetBtn: '[data-reset]' });
+  const v = DEMO.genuineParts;
+  const earned    = v.orders * v.ratePerOrder;
+  const remaining = v.potTotal - v.potIssued;
+  const conv      = Math.round(v.orders / v.drives * 1000) / 10;
+
+  document.getElementById('potMsg').textContent =
+    pts(remaining) + ' points of the national pot are still available. ' + DEMO.daysLeft +
+    ' days left in ' + DEMO.period.split(' ')[0] + '.';
+  document.getElementById('potUpd').textContent  = DEMO.asOf;
+  document.getElementById('potRemN').textContent = pts(remaining);
+  document.getElementById('potIssN').textContent = pts(v.potIssued);
+  document.getElementById('hBase').textContent   = v.networkRate + '%';
+  document.getElementById('hRate').textContent   = money(v.ratePerOrder);
+  document.getElementById('hPot').textContent    = pts(v.potTotal) + ' points';
+  document.getElementById('vUnits').textContent  = conv + '%';
+  document.getElementById('vBase').textContent   = v.networkRate + '%';
+
+  /* thermometer heights, proportional to the pot */
+  document.getElementById('thermRem').style.height = Math.round(remaining / v.potTotal * 100) + '%';
+  document.getElementById('thermIss').style.height = Math.max(9, Math.round(v.potIssued / v.potTotal * 100)) + '%';
+
+  const step = v.potTotal / 5;
+  const scale = [5,4,3,2,1,0].map(n => `<span>${pts(Math.round(n*step))}</span>`).join('');
+  document.getElementById('scale1').innerHTML = scale;
+  document.getElementById('scale2').innerHTML = scale;
+
+  document.getElementById('fiRows').innerHTML = v.rows.map(r =>
+    `<tr><td>${r.date}</td><td>${r.n}</td><td>${money(r.reward)}</td></tr>`).join('');
+  document.getElementById('fiCount').textContent = v.orders;
+  document.getElementById('fiTotal').textContent = money(earned);
+
+  document.getElementById('partRows').innerHTML = [
+    ['Qualifying drive','A completed test drive logged against the same customer record'],
+    ['Qualifying order','Retail order signed and delivered inside the period'],
+    ['Attribution',   'The executive who took the drive, not whoever wrote the order'],
+    ['Confirmation',  'Sales system, at invoice'],
+    ['Exclusions',    'Fleet, staff and internal orders do not count towards conversion']
+  ].map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('');
+</script>
+</body>
+</html>

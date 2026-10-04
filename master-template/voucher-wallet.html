@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XPENG Vector — Voucher Wallet</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="assets/favicon.png" type="image/png">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<div id="chrome"></div>
+
+<section class="pb-hero">
+  <h1>Voucher Wallet</h1>
+  <p>Everything you have redeemed, ready to use</p>
+</section>
+<div class="crumb"><div class="crumb-in">
+  <a href="index.html">Home</a> &nbsp;&rsaquo;&nbsp; Voucher Wallet
+</div></div>
+
+<div class="wrap section">
+  <div class="panel">
+    <div class="rail-head">
+      <div>
+        <h2 class="h-sec">Your vouchers</h2>
+        <p class="sub" style="margin:0">Account <span id="vwAcct"></span> · <span id="vwCount"></span></p>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <span class="sub" id="vwValue" style="margin:0"></span>
+        <span class="illus"><i></i>Illustrative data</span>
+      </div>
+    </div>
+
+    <div class="vw-grid" style="margin-top:20px" id="walletGrid"></div>
+
+    <p class="illus-note" style="max-width:78ch">
+      Every voucher here matches a redemption on your statement, so the wallet and the Points Bank can
+      never disagree.
+      <a class="link" href="points-bank.html">Open your statement →</a>
+    </p>
+  </div>
+
+  <div class="panel">
+    <div class="grid-2" style="align-items:center">
+      <div>
+        <h2 class="h-sec" style="margin-bottom:10px">Nothing here yet this month?</h2>
+        <p class="sub" style="max-width:52ch">You have <span id="vwBal"></span> to spend. The shop carries
+          gift cards, dining, travel, experiences and the signature tier, all on the same balance.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:16px">
+          <a class="btn" href="shop.html">Browse the shop</a>
+          <a class="btn btn-ghost" href="points-bank.html">See your statement</a>
+        </div>
+      </div>
+      <div class="rail-photo" style="aspect-ratio:16/9"><img src="assets/img/retailer-front.jpg" alt=""></div>
+    </div>
+  </div>
+</div>
+
+<div id="foot"></div>
+<div id="modalHost" class="modal"></div>
+
+<script src="assets/config.js"></script>
+<script src="assets/i18n.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/i18n-core.js"></script>
+<script src="assets/i18n-build.js"></script>
+<script src="assets/app.js"></script>
+<script>
+  renderWallet('walletGrid');
+  boot('Voucher Wallet');
+
+  const W = DEMO.wallet;
+  const ready = W.filter(v => v.status === 'ready');
+  document.getElementById('vwAcct').textContent  = DEMO.customer.account;
+  document.getElementById('vwCount').textContent =
+    W.length + ' redeemed · ' + ready.length + ' ready to use';
+  document.getElementById('vwValue').textContent =
+    money(ready.reduce((s,v) => s + v.value, 0)) + ' unused voucher value';
+  document.getElementById('vwBal').textContent =
+    pts(DEMO.points.balance) + ' points (' + ptsToCur(DEMO.points.balance) + ')';
+</script>
+</body>
+</html>

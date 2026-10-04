@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>XPENG Vector — Network</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="assets/favicon.png" type="image/png">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+<div id="chrome"></div>
+
+<!-- ============ NETWORK ADOPTION AND DRILL-DOWN ============
+     One page, four levels: United Kingdom, region, retailer, individual.
+     A breadcrumb rather than four separate pages, because the point being
+     demonstrated is that it is one view at different depths.
+
+     The adoption funnel is the same component at every level, so the shape a
+     viewer learns at Europe is the shape they already know two clicks later.
+     ========================================================= -->
+<div class="admin">
+  <div class="admin-top">
+    <div class="admin-top-in">
+      <h1>Network <span>Adoption</span></h1>
+      <span class="chip">Programme
+        <select aria-label="Programme"><option>XPENG Vector</option></select></span>
+      <span class="chip">Period
+        <select aria-label="Period"><option>September 2026</option><option>Q3 2026</option></select></span>
+      <span class="illus"><i></i>Illustrative data</span>
+    </div>
+  </div>
+
+  <div class="wrap" style="padding-top:20px;padding-bottom:46px">
+
+    <!-- breadcrumb: the drill-down made visible -->
+    <nav class="drill" aria-label="Network level" data-rm="rm-drill-crumb">
+      <ol id="drillCrumb"></ol>
+    </nav>
+
+    <!-- headline funnel, same component at every level -->
+    <div data-rm="rm-onboarding-funnel">
+      <div class="lvl-head">
+        <div>
+          <h2 class="h-sec" id="lvlTitle"></h2>
+          <p class="sub" style="margin:0" id="lvlSub"></p>
+        </div>
+        <div class="lvl-vs" id="lvlVs"></div>
+      </div>
+      <div class="funnel" id="funnel"></div>
+      <div class="funnel-note" id="funnelNote"></div>
+    </div>
+
+    <!-- the rows one level down -->
+    <div class="widget" style="margin-top:20px" data-rm="rm-drill-table">
+      <div class="widget-h">
+        <h3 id="tableTitle"></h3>
+        <div class="widget-tools">
+          <span class="mini" id="tableCount"></span>
+          <span class="mini">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M8 1v9m0 0L4.5 6.5M8 10l3.5-3.5M2 13h12"/></svg>
+            Export</span>
+        </div>
+      </div>
+      <div class="drill-wrap"><div id="drillRows"></div></div>
+      <p class="illus-note" id="drillNote"></p>
+    </div>
+
+    <!-- individual level replaces the table -->
+    <div id="personView" hidden></div>
+
+    <p class="illus-note" style="max-width:78ch">
+      All figures on this page are illustrative demonstration data created for this walkthrough.
+      They do not represent any real programme, account, retailer or person.
+    </p>
+
+  </div>
+</div>
+
+<div id="foot"></div>
+<div id="modalHost" class="modal"></div>
+
+<script src="assets/config.js"></script>
+<script src="assets/i18n.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/i18n-core.js"></script>
+<script src="assets/i18n-build.js"></script>
+<script src="assets/app.js"></script>
+<script>
+  boot('Network', {admin:true});
+  renderNetwork();
+</script>
+</body>
+</html>
