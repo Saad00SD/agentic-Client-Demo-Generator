@@ -221,12 +221,18 @@ function applyClientTextReplacement() {
     if (tagline) el.textContent = tagline;
   });
 
+  // Update Programme selector dropdown in admin dashboard / console
+  document.querySelectorAll('select[aria-label="Programme"] option').forEach(opt => {
+    const pName = platformName ? `${clientName} ${platformName}` : clientName;
+    opt.textContent = pName;
+  });
+
   const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   const nodes = [];
   let n; while(n = walk.nextNode()) nodes.push(n);
 
   for (const node of nodes) {
-    if (node.parentElement && node.parentElement.closest('script,style,textarea,input,select')) continue;
+    if (node.parentElement && node.parentElement.closest('script,style,textarea,input')) continue;
     let txt = node.textContent;
     if (txt && (txt.includes("XPENG") || (platformName && txt.includes("Vector")))) {
       let newTxt = txt.replace(/XPENG\s*UK/gi, clientName).replace(/XPENG/gi, clientName);
@@ -439,8 +445,85 @@ function wireAccordion(){
   });
 }
 
+/* ---------- dynamic campaign hero & page data ------------------ */
+function renderHeroCarousel(){
+  const car = document.getElementById('heroCarousel');
+  if(!car) return;
+  const cfg = window.CLIENT_CONFIG || {};
+  if(!cfg.campaigns || !cfg.campaigns.length) return;
+
+  const detailPages = ['first-time-fix.html', 'service-league.html', 'genuine-parts.html', 'ev-service-ready.html', 'next-service-booked.html'];
+  const campaigns = cfg.campaigns;
+
+  const slidesHtml = campaigns.map((c, idx) => {
+    const isFirst = idx === 0;
+    const targetHref = c.href || detailPages[idx % detailPages.length];
+    const imgPath = c.img || c.tileImage || 'assets/img/kv-test-drive.jpg';
+    return `
+    <div class="slide ${isFirst ? 'on' : ''}">
+      <div class="slide-kv"><img src="${imgPath}" alt="${c.name || ''}"></div>
+      <div class="slide-copy">
+        <h3>${c.name}</h3>
+        <p>${c.blurb || ''}</p>
+        <div class="slide-actions">
+          <a class="btn" href="${targetHref}">Learn more</a>
+          <a class="gg-play-link" href="${targetHref}#campaignGame" target="_blank" rel="noopener">Campaign Game →</a>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const dotsHtml = campaigns.map((_, idx) => `<button class="${idx === 0 ? 'on' : ''}" aria-label="Campaign ${idx + 1}"></button>`).join('');
+
+  car.innerHTML = `
+    <button class="carousel-arrow ca-prev" aria-label="Previous campaign">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2L4 8l6 6"/></svg>
+    </button>
+    ${slidesHtml}
+    <button class="carousel-arrow ca-next" aria-label="Next campaign">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2l6 6-6 6"/></svg>
+    </button>
+    <div class="dots">${dotsHtml}</div>`;
+}
+
+function applyCampaignDetailPageData() {
+  const cfg = window.CLIENT_CONFIG || {};
+  if (!cfg.campaigns || !cfg.campaigns.length) return;
+
+  const path = location.pathname.split('/').pop() || 'index.html';
+  const detailPages = ['first-time-fix.html', 'service-league.html', 'genuine-parts.html', 'ev-service-ready.html', 'next-service-booked.html'];
+  
+  const pageIdx = detailPages.indexOf(path);
+  if (pageIdx === -1 && !cfg.campaigns.some(c => c.href === path)) return;
+
+  const camp = cfg.campaigns.find(c => c.href === path) || cfg.campaigns[pageIdx % cfg.campaigns.length];
+  if (!camp) return;
+
+  const h1 = document.querySelector('.hero h1, .admin-top h1, h1');
+  if (h1 && camp.name) {
+    h1.innerHTML = camp.name;
+  }
+
+  const lede = document.querySelector('.hero-lede, p.hero-lede, .hero p');
+  if (lede && camp.blurb) {
+    lede.textContent = camp.blurb;
+  }
+
+  const kvImg = document.querySelector('.hero-media img, .slide-kv img, .campaign-kv img');
+  if (kvImg && (camp.img || camp.tileImage)) {
+    kvImg.src = camp.img || camp.tileImage;
+    kvImg.alt = camp.name || '';
+  }
+
+  const ctype = document.querySelector('.ctype, .rcard-tag, .chip-type');
+  if (ctype && camp.type) {
+    ctype.textContent = camp.type;
+  }
+}
+
 /* ---------- carousel (evidenced hero pattern) --------------- */
 function wireCarousel(){
+  renderHeroCarousel();
   const car = document.querySelector('[data-carousel]');
   if(!car) return;
   const slides = car.querySelectorAll('.slide');
@@ -579,16 +662,12 @@ function wireSherbot(){
 
 /* ---------- boot -------------------------------------------- */
 function boot(active, opts){
-  /* Voice of the Network / Network Intelligence. Rendered by the shared
-     master module; this build only supplies DEMO.von. */
   if(typeof VON !== 'undefined') setTimeout(VON.boot, 0);
   mountChrome(active, opts);
   wireTabs(); wireAccordion(); wireCarousel();
   wireLedger(); wireAdminFilters(); wireSherbot();
+  applyCampaignDetailPageData();
   openGameFromHash();
-  /* Each page writes its own content after boot() in an inline script, so the
-     translation pass has to wait for the document to finish rather than run
-     here. Both calls are cheap and idempotent. */
   wireReset();
   applyLang();
   window.addEventListener('load', applyLang);
@@ -606,19 +685,27 @@ function boot(active, opts){
 function renderRail(mountId){
   const el = document.getElementById(mountId);
   if(!el) return;
-  el.innerHTML = DEMO.rail.map(c => {
-    const isLink = c.href && c.href !== '#';
+  const cfg = window.CLIENT_CONFIG || {};
+  const campaigns = (cfg.campaigns && cfg.campaigns.length) ? cfg.campaigns : DEMO.rail;
+
+  const detailPages = ['first-time-fix.html', 'service-league.html', 'genuine-parts.html', 'ev-service-ready.html', 'next-service-booked.html'];
+
+  el.innerHTML = campaigns.map((c, idx) => {
+    const targetHref = c.href || detailPages[idx % detailPages.length];
+    const isLink = targetHref && targetHref !== '#';
     const tag = isLink ? 'a' : 'button';
-    const attr = isLink ? `href="${c.href}"` : `type="button" data-modal="${c.id}"`;
+    const attr = isLink ? `href="${targetHref}"` : `type="button" data-modal="${c.id}"`;
+    const imgPath = c.img || c.tileImage || 'assets/img/kv-test-drive.jpg';
+    const cType = c.type || 'Incentive';
     return `<${tag} class="rcard" ${attr}>
       <span class="rcard-img">
-        <img src="${c.img}" alt="" loading="lazy">
-        <span class="rcard-tag">${c.type}</span>
+        <img src="${imgPath}" alt="${c.name || ''}" loading="lazy">
+        <span class="rcard-tag">${cType}</span>
         ${c.status ? `<span class="rcard-status">${c.status}</span>` : ''}
       </span>
       <span class="rcard-body">
         <h3>${c.name}</h3>
-        <p>${c.blurb}</p>
+        <p>${c.blurb || ''}</p>
         <span class="go">${isLink ? 'Open campaign →' : 'Campaign summary →'}</span>
       </span>
     </${tag}>`;
@@ -660,8 +747,13 @@ function wireModals(){
   const close = () => { host.classList.remove('on'); document.body.style.overflow = ''; };
 
   const open = id => {
-    const c = DEMO.rail.find(x => x.id === id);
-    if(!c || !c.modal) return;
+    const cfg = window.CLIENT_CONFIG || {};
+    const pool = (cfg.campaigns && cfg.campaigns.length) ? cfg.campaigns : DEMO.rail;
+    let c = pool.find(x => x.id === id) || DEMO.rail.find(x => x.id === id);
+    if(!c) return;
+    const modalLede = (c.modal && c.modal.lede) || c.blurb || '';
+    const modalRows = (c.modal && c.modal.rows) || [['Type', c.type || 'Incentive'], ['Status', c.status || 'Active']];
+    const modalNote = (c.modal && c.modal.note) || 'Campaign parameters configured for this client demo.';
     host.innerHTML = `
       <div class="modal-bg" data-close></div>
       <div class="modal-card" role="dialog" aria-modal="true" aria-label="${c.name}">
@@ -670,15 +762,15 @@ function wireModals(){
             <path d="M3 3l10 10M13 3L3 13"/></svg>
         </button>
         <div class="modal-hero">
-          <span class="ctype"><i></i>${c.type}</span>
+          <span class="ctype"><i></i>${c.type || 'Incentive'}</span>
           <h3>${c.name}</h3>
-          <p>${c.modal.lede}</p>
+          <p>${modalLede}</p>
         </div>
         <div class="modal-body">
           <table><tbody>
-            ${c.modal.rows.map(r => `<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join('')}
+            ${modalRows.map(r => `<tr><th>${r[0]}</th><td>${r[1]}</td></tr>`).join('')}
           </tbody></table>
-          <div class="modal-note">${c.modal.note}</div>
+          <div class="modal-note">${modalNote}</div>
         </div>
         <div class="modal-foot">
           <span class="illus"><i></i>Illustrative campaign concept</span>
