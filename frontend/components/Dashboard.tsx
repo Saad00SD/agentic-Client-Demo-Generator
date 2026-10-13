@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import {
-  Sparkles,
   Layers,
   Globe,
   Languages as LangIcon,
@@ -32,7 +31,7 @@ const DEFAULT_CONFIG: ClientConfig = {
   tagline: "Driven by Passion",
   defaultLanguage: "en",
   branding: {
-    logo: "assets/lkq-logo.svg",
+    logo: "assets/geely-logo.svg",
     primaryColor: "#000000",
     secondaryColor: "#1a1a1a",
     accentColor: "#FFD200",
@@ -107,62 +106,15 @@ const DEFAULT_CONFIG: ClientConfig = {
   ]
 };
 
-const SAMPLE_PROMPTS = [
-  "Create a Renault demo called Pulse for Romania. Use English and Romanian. Primary color: #000000, Accent: #FFD200.",
-  "Create a BMW Group demo called Équipe for Germany. Use German and English. Primary color: #0066B1, Accent: #00f0ff.",
-  "Create a Ford Pro demo called Rewards for United Kingdom. Use English. Primary color: #002C6C, Accent: #FF5500."
-];
-
 export default function Dashboard() {
   const [config, setConfig] = useState<ClientConfig>(DEFAULT_CONFIG);
   const [rawRegions, setRawRegions] = useState<string>(DEFAULT_CONFIG.countryConfig.regions.join(", "));
   const [rawBranches, setRawBranches] = useState<string>(DEFAULT_CONFIG.countryConfig.branches.join(", "));
   const [activeTab, setActiveTab] = useState<"client" | "country" | "languages" | "campaigns">("client");
-  const [aiPrompt, setAiPrompt] = useState("");
-  const [isExtracting, setIsExtracting] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [genLogs, setGenLogs] = useState<string[]>([]);
   const [result, setResult] = useState<GenerationResult | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-
-  // Handle AI prompt extraction
-  const handleAiExtract = async (promptToUse?: string) => {
-    const text = promptToUse || aiPrompt;
-    if (!text.trim()) return;
-
-    setIsExtracting(true);
-    setGenLogs((prev) => [...prev, `AI Agent: Interpreting requirements prompt...`]);
-
-    try {
-      const res = await fetch(`${API_BASE}/projects`);
-      const proj = await res.json();
-      const projId = proj.projectId;
-
-      const reqRes = await fetch(`${API_BASE}/projects/${projId}/requirements`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: text })
-      });
-
-      const reqData = await reqRes.json();
-      if (reqData.clientConfig) {
-        setConfig(reqData.clientConfig);
-        if (reqData.clientConfig.countryConfig) {
-          if (reqData.clientConfig.countryConfig.regions) {
-            setRawRegions(reqData.clientConfig.countryConfig.regions.join(", "));
-          }
-          if (reqData.clientConfig.countryConfig.branches) {
-            setRawBranches(reqData.clientConfig.countryConfig.branches.join(", "));
-          }
-        }
-        setGenLogs((prev) => [...prev, `AI Agent: Config extracted successfully for ${reqData.clientConfig.clientName}`]);
-      }
-    } catch (e: any) {
-      setGenLogs((prev) => [...prev, `Extraction notice: Local AI parsing fallback applied.`]);
-    } finally {
-      setIsExtracting(false);
-    }
-  };
 
   const handleLogoFileUpload = (file: File) => {
     const reader = new FileReader();
@@ -194,21 +146,7 @@ export default function Dashboard() {
   const handleGenerate = async () => {
     setIsGenerating(true);
     setResult(null);
-    setGenLogs([
-      "LangGraph: Initializing Demo Generation Workflow...",
-      "LangGraph [Node 1]: receive_requirements",
-      "LangGraph [Node 2]: extract_client_requirements",
-      "LangGraph [Node 3]: validate_requirements -> Pydantic Schema Validated",
-      "LangGraph [Node 4]: prepare_template -> Copying master-template",
-      "LangGraph [Node 5]: configure_branding -> Injecting brand tokens & CSS custom properties",
-      "LangGraph [Node 6]: configure_country -> Applying geographic regions & currency",
-      "LangGraph [Node 7]: configure_languages -> Generating i18n locale dictionaries",
-      "LangGraph [Node 8]: configure_campaigns -> Structuring campaign matrix",
-      "LangGraph [Node 9]: process_assets -> Validating & copying uploaded media assets",
-      "LangGraph [Node 10]: generate_demo -> Compiling final output files",
-      "LangGraph [Node 11]: validate_demo -> Running automated verification & link check",
-      "LangGraph [Node 12]: package_demo -> Zipping production output"
-    ]);
+    setGenLogs(["Generating your demo from the master template and entered details..."]);
 
     try {
       const res = await fetch(`${API_BASE}/generate-direct`, {
@@ -218,6 +156,7 @@ export default function Dashboard() {
       });
 
       const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Generation failed");
       setResult({
         projectId: data.projectId,
         status: data.status,
@@ -259,7 +198,7 @@ export default function Dashboard() {
   };
 
   const addCampaign = () => {
-    const newId = `camp-${config.campaigns.length + 1}`;
+    const newId = `camp-${crypto.randomUUID()}`;
     const newCamp: CampaignConfig = {
       id: newId,
       name: `New Incentive #${config.campaigns.length + 1}`,
@@ -297,10 +236,8 @@ export default function Dashboard() {
             </div>
             <div>
               <h1 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
-                AI-Powered Client Demo Generator
-                <span className="px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-full">
-                  LangGraph Inside
-                </span>
+                Client Demo Generator
+
               </h1>
               <p className="text-xs text-gray-400">One Master Template + Structured Configuration = Custom Demos</p>
             </div>
@@ -317,60 +254,6 @@ export default function Dashboard() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8 flex flex-col gap-8">
-        {/* AI Requirements Prompt Box */}
-        <div className="glass-panel p-6 border-blue-500/30 shadow-xl relative overflow-hidden">
-          <div className="absolute -top-12 -right-12 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-          <div className="flex items-center justify-between mb-3">
-            <label className="text-sm font-semibold text-white flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-amber-400 animate-spin-slow" />
-              AI Natural-Language Generator Brief
-            </label>
-            <span className="text-xs text-gray-400">Type a brief or select a preset prompt</span>
-          </div>
-
-          <div className="flex flex-col md:flex-row gap-3">
-            <textarea
-              value={aiPrompt}
-              onChange={(e) => setAiPrompt(e.target.value)}
-              placeholder="e.g. Create a Renault demo called Pulse for Romania. Use English and Romanian. Primary color: #000000, Accent: #FFD200..."
-              className="flex-1 bg-gray-950/80 border border-gray-700/80 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-blue-500 resize-none h-20 placeholder-gray-500 transition"
-            />
-            <button
-              onClick={() => handleAiExtract()}
-              disabled={isExtracting || !aiPrompt.trim()}
-              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold text-sm rounded-xl transition shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed self-stretch md:self-auto"
-            >
-              {isExtracting ? (
-                <>
-                  <RefreshCw className="w-4 h-4 animate-spin" /> AI Extracting...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4 text-amber-300" /> AI Extract Config
-                </>
-              )}
-            </button>
-          </div>
-
-          {/* Quick Presets */}
-          <div className="flex items-center gap-2 mt-3 flex-wrap">
-            <span className="text-xs text-gray-400 font-medium">Quick Prompts:</span>
-            {SAMPLE_PROMPTS.map((promptText, i) => (
-              <button
-                key={i}
-                onClick={() => {
-                  setAiPrompt(promptText);
-                  handleAiExtract(promptText);
-                }}
-                className="text-xs bg-gray-800/80 hover:bg-blue-900/40 text-gray-300 hover:text-blue-300 border border-gray-700/60 hover:border-blue-500/40 px-3 py-1 rounded-full transition"
-              >
-                {promptText.split(" ")[1]} {promptText.split(" ")[3]}
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* Dashboard Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Form Tabs Column (Left - 8 cols) */}

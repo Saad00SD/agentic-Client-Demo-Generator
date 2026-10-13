@@ -158,3 +158,25 @@ def test_data_url_asset_generation():
     assert os.path.exists(os.path.join(res["output_dir"], res["config"]["branding"]["logo"]))
     assert os.path.exists(os.path.join(res["output_dir"], res["config"]["campaigns"][0]["img"]))
 
+
+
+def test_each_campaign_has_unique_detail_page(tmp_path):
+    campaigns = [
+        {"id": "duplicate", "name": f"Custom Campaign {i}",
+         "blurb": f"Description {i}", "status": "Live", "type": "Custom",
+         "href": "missing-page.html" if i % 2 else "#"}
+        for i in range(7)
+    ]
+    result = generate_demo(
+        {"campaigns": campaigns, "branding": {"logo": "assets/geely-logo.svg"}}, MASTER_TEMPLATE_DIR, str(tmp_path / "demo")
+    )
+    links = [camp["href"] for camp in result["config"]["campaigns"]]
+    assert len(set(links)) == len(campaigns)
+    import zipfile
+    with zipfile.ZipFile(result["zip_path"]) as archive:
+        for i, link in enumerate(links):
+            page = (Path(result["output_dir"]) / link).read_text(encoding="utf-8")
+            assert f"<h1>Custom Campaign {i}</h1>" in page
+            assert f'<p class="cam-lede">Description {i}</p>' in page
+            assert link in archive.namelist()
+    assert not result["validation"]["errors"]

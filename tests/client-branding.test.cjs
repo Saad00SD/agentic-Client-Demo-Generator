@@ -89,3 +89,31 @@ test('replacement strings are literal and are not recursively expanded', () => {
   f.run('applyLang(); applyLang()');
   assert.equal(text.textContent, 'XPENG Partners $& Vector Plus');
 });
+
+
+test('campaign detail uses the selected campaign and actual template fields', () => {
+  const f = fixture();
+  const nodes = {};
+  for (const key of ['h1', 'lede', 'image', 'type', 'status']) nodes[key] = {};
+  f.context.location = { pathname: '/preview/campaign-7.html' };
+  f.context.window.CLIENT_CONFIG.campaigns = [
+    { href: 'campaign-1.html', name: 'First campaign' },
+    { href: 'campaign-7.html', name: '<Custom title>', blurb: 'Entered description',
+      type: 'Custom incentive', img: 'assets/custom.png', status: 'Active' }
+  ];
+  f.context.document.querySelector = selector => {
+    if (selector.includes('h1')) return nodes.h1;
+    if (selector.includes('.cam-lede')) return nodes.lede;
+    if (selector.includes('.keyvis img')) return nodes.image;
+    if (selector.includes('.ctype')) return nodes.type;
+    if (selector === '.keyvis-meta') return nodes.status;
+    return null;
+  };
+  f.run('applyCampaignDetailPageData()');
+  assert.equal(nodes.h1.textContent, '<Custom title>');
+  assert.equal(nodes.lede.textContent, 'Entered description');
+  assert.equal(nodes.image.src, 'assets/custom.png');
+  assert.equal(nodes.type.textContent, 'Custom incentive');
+  assert.equal(nodes.status.textContent, 'Active');
+  assert.equal(f.context.document.title, 'Renault Pulse \u2014 <Custom title>');
+});

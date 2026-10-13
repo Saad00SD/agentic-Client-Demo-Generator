@@ -1,5 +1,7 @@
 import os
 import json
+import re
+from html import escape
 from pathlib import Path
 from typing import Dict, Any, Optional
 
@@ -41,7 +43,15 @@ def generate_demo(
         config_dict["branding"]["logo"] = f"assets/client/{os.path.basename(dest_logo)}"
 
     campaigns = config_dict.get("campaigns", [])
+    detail_pages = ["first-time-fix.html", "service-league.html", "genuine-parts.html", "ev-service-ready.html", "next-service-booked.html"]
     for idx, camp in enumerate(campaigns):
+        # Each campaign owns a page, including campaigns beyond the five layouts.
+        template_page = detail_pages[idx % len(detail_pages)]
+        page_html = (target_path / template_page).read_text(encoding="utf-8")
+        camp["href"] = f"campaign-{idx + 1}.html"
+        page_html = re.sub(r"(<h1[^>]*>).*?(</h1>)", lambda m: m[1] + escape(camp["name"]) + m[2], page_html, count=1, flags=re.S)
+        page_html = re.sub(r'(<p class="cam-lede">).*?(</p>)', lambda m: m[1] + escape(camp["blurb"]) + m[2], page_html, count=1, flags=re.S)
+        (target_path / camp["href"]).write_text(page_html, encoding="utf-8")
         img_val = camp.get("img", "")
         key = f"campaign_{idx}"
         if img_val and img_val.startswith("data:"):

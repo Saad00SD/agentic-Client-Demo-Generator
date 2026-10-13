@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "AI-Powered Client Demo Generator",
-  description: "Generate customized client demo websites using LangGraph and Master Template Engine.",
+  title: "Client Demo Generator",
+  description: "Generate customized client demo websites from your entered details and the existing master template.",
 };
 
 export default function RootLayout({

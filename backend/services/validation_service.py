@@ -69,6 +69,9 @@ def validate_generated_demo(output_dir: str, config: Dict[str, Any]) -> Validati
     # 4. Campaign Images Check
     campaigns = config.get("campaigns", [])
     for idx, camp in enumerate(campaigns):
+        href = camp.get("href", "")
+        if not href or href == "#" or not (base_path / href).is_file():
+            errors.append(f"Campaign #{idx+1} ({camp.get('name')}) has no available detail page: {href}")
         img_rel = camp.get("img") or camp.get("tileImage")
         if img_rel and not (base_path / img_rel).exists():
             warnings.append(f"Campaign #{idx+1} ({camp.get('name')}) image not found: {img_rel}")

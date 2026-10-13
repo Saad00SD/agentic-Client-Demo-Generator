@@ -508,23 +508,46 @@ function applyCampaignDetailPageData() {
 
   const h1 = document.querySelector('.hero h1, .admin-top h1, h1');
   if (h1 && camp.name) {
-    h1.innerHTML = camp.name;
+    h1.textContent = camp.name;
   }
 
-  const lede = document.querySelector('.hero-lede, p.hero-lede, .hero p');
-  if (lede && camp.blurb) {
-    lede.textContent = camp.blurb;
+  const lede = document.querySelector('.cam-lede, .hero-lede, p.hero-lede, .hero p');
+  if (lede) {
+    lede.textContent = camp.blurb || '';
   }
 
-  const kvImg = document.querySelector('.hero-media img, .slide-kv img, .campaign-kv img');
-  if (kvImg && (camp.img || camp.tileImage)) {
-    kvImg.src = camp.img || camp.tileImage;
+  const kvImg = document.querySelector('.keyvis img, .hero-media img, .slide-kv img, .campaign-kv img');
+  if (kvImg && (camp.heroImage || camp.img || camp.tileImage)) {
+    kvImg.src = camp.heroImage || camp.img || camp.tileImage;
     kvImg.alt = camp.name || '';
   }
 
   const ctype = document.querySelector('.ctype, .rcard-tag, .chip-type');
   if (ctype && camp.type) {
     ctype.textContent = camp.type;
+  }
+  document.title = `${cfg.clientName || ''} ${cfg.platformName || ''} — ${camp.name}`.trim();
+  const meta = document.querySelector('.keyvis-meta');
+  if (meta) meta.textContent = camp.status || '';
+  const pager = document.querySelector('.cam-pager');
+  if (pager) {
+    const index = cfg.campaigns.indexOf(camp);
+    pager.replaceChildren();
+    const addLink = (offset, label) => {
+      if (cfg.campaigns.length < 2) return;
+      const other = cfg.campaigns[(index + offset + cfg.campaigns.length) % cfg.campaigns.length];
+      const link = document.createElement('a');
+      link.className = 'cam-pager-link ' + (offset < 0 ? 'prev' : 'next');
+      link.href = other.href;
+      link.textContent = `${label}: ${other.name}`;
+      pager.appendChild(link);
+    };
+    addLink(-1, 'Previous');
+    const count = document.createElement('span');
+    count.className = 'cam-pager-count';
+    count.textContent = `${index + 1} / ${cfg.campaigns.length}`;
+    pager.appendChild(count);
+    addLink(1, 'Next');
   }
 }
 
