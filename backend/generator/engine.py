@@ -7,7 +7,7 @@ from typing import Dict, Any, Optional
 
 from backend.models.client_config import ClientConfig
 from backend.services.template_service import copy_master_template
-from backend.services.asset_service import copy_asset, save_data_url_asset
+from backend.services.asset_service import copy_asset, save_data_url_asset, save_logo_as_svg
 from backend.services.localization_service import generate_locales
 from backend.services.validation_service import validate_generated_demo, ValidationReport
 from backend.services.packaging_service import package_demo_to_zip
@@ -36,10 +36,10 @@ def generate_demo(
     # 3. Handle logo & campaign assets (Data URLs or file uploads)
     branding_logo = config_dict.get("branding", {}).get("logo", "")
     if branding_logo and branding_logo.startswith("data:"):
-        dest_logo = save_data_url_asset(branding_logo, str(target_path / "assets" / "client"), "logo")
+        dest_logo = save_logo_as_svg(branding_logo, str(target_path / "assets" / "client"))
         config_dict["branding"]["logo"] = f"assets/client/{os.path.basename(dest_logo)}"
     elif uploaded_assets and "logo" in uploaded_assets and os.path.exists(uploaded_assets["logo"]):
-        dest_logo = copy_asset(uploaded_assets["logo"], str(target_path / "assets" / "client"), "logo.svg")
+        dest_logo = save_logo_as_svg(uploaded_assets["logo"], str(target_path / "assets" / "client"))
         config_dict["branding"]["logo"] = f"assets/client/{os.path.basename(dest_logo)}"
 
     campaigns = config_dict.get("campaigns", [])

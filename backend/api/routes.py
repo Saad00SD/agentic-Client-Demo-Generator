@@ -95,13 +95,19 @@ async def generate_project(project_id: str):
     state["generation_status"] = "running"
 
     # Execute LangGraph workflow
-    final_state = demo_graph.invoke(state)
+    execution_log = ["LangGraph: Initializing Demo Generation Workflow..."]
+    final_state = dict(state)
+    for step_number, updates in enumerate(demo_graph.stream(state, stream_mode="updates"), 1):
+        for node_name, update in updates.items():
+            execution_log.append(f"LangGraph [Node {step_number}]: {node_name}")
+            final_state.update(update)
 
     PROJECTS[project_id] = final_state
 
     return {
         "projectId": project_id,
         "status": final_state.get("generation_status"),
+        "executionLog": execution_log,
         "report": final_state.get("report"),
         "errors": final_state.get("validation_errors", []),
         "previewUrl": f"/api/projects/{project_id}/preview/index.html",
@@ -143,6 +149,14 @@ async def generate_direct(body: Dict[str, Any]):
         "projectId": project_id,
         "status": "completed",
         "validation": res["validation"],
+        "executionLog": [
+            "Template Engine: Validated entered configuration",
+            "Template Engine: Copied master template",
+            "Template Engine: Applied branding, country, languages and campaigns",
+            "Template Engine: Processed logo and campaign media",
+            "Template Engine: Validated generated pages and assets",
+            "Template Engine: Packaged demo ZIP"
+        ],
         "previewUrl": f"/api/projects/{project_id}/preview/index.html",
         "downloadUrl": f"/api/projects/{project_id}/download"
     }

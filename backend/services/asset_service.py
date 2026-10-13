@@ -4,6 +4,46 @@ import re
 from pathlib import Path
 
 from typing import Optional
+import base64
+import mimetypes
+import xml.etree.ElementTree as ET
+from urllib.parse import unquote_to_bytes
+
+
+def save_logo_as_svg(source: str, dest_dir: str) -> str:
+    """Keep vector uploads as SVG; embed raster uploads in a portable SVG."""
+    if source.startswith("data:"):
+        header, encoded = source.split(",", 1)
+        mime = header[5:].split(";")[0]
+        data = base64.b64decode(encoded, validate=True) if ";base64" in header else unquote_to_bytes(encoded)
+    else:
+        path = Path(source)
+        data = path.read_bytes()
+        mime = mimetypes.guess_type(path.name)[0] or ""
+    if mime == "image/svg+xml":
+        root = ET.fromstring(data)
+        if root.tag.split("}")[-1] != "svg":
+            raise ValueError("Logo is not a valid SVG")
+        if not root.get("viewBox"):
+            width = root.get("width", "160").removesuffix("px")
+            height = root.get("height", "48").removesuffix("px")
+            try:
+                root.set("viewBox", f"0 0 {float(width)} {float(height)}")
+            except ValueError:
+                pass
+        root.set("preserveAspectRatio", "xMidYMid meet")
+        data = ET.tostring(root, encoding="utf-8", xml_declaration=True)
+    elif mime in {"image/png", "image/jpeg", "image/webp", "image/gif", "image/bmp", "image/avif"}:
+        embedded = base64.b64encode(data).decode("ascii")
+        data = (f'<svg xmlns="http://www.w3.org/2000/svg" width="160" height="48" viewBox="0 0 160 48">'
+                f'<image width="160" height="48" preserveAspectRatio="xMidYMid meet" href="data:{mime};base64,{embedded}"/>'
+                '</svg>').encode("utf-8")
+    else:
+        raise ValueError(f"Unsupported logo image type: {mime}")
+    target = Path(dest_dir) / "logo.svg"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(data)
+    return str(target)
 
 def sanitize_filename(filename: str) -> str:
     clean_name = os.path.basename(filename)

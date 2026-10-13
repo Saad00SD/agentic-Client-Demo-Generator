@@ -292,7 +292,7 @@ function topbar(active, opts){
   <header class="topbar">
     <div class="topbar-in">
       <a class="brand" href="index.html" aria-label="${clientName} ${platformName} home">
-        <img class="brand-logo" src="${logo}" alt="${clientName}" style="max-height:38px;width:auto;max-width:160px;object-fit:contain;vertical-align:middle;">
+        <img class="brand-logo" src="${logo}" alt="${clientName}">
         <span class="brand-sub">${platformName}</span>
       </a>
       <button class="navtoggle" id="navtoggle" aria-label="Menu" aria-expanded="false">

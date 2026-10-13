@@ -153,7 +153,7 @@ def test_data_url_asset_generation():
     )
 
     assert res["status"] in ["success", "warning"]
-    assert res["config"]["branding"]["logo"].startswith("assets/client/")
+    assert res["config"]["branding"]["logo"] == "assets/client/logo.svg"
     assert res["config"]["campaigns"][0]["img"].startswith("assets/campaigns/")
     assert os.path.exists(os.path.join(res["output_dir"], res["config"]["branding"]["logo"]))
     assert os.path.exists(os.path.join(res["output_dir"], res["config"]["campaigns"][0]["img"]))
@@ -180,3 +180,20 @@ def test_each_campaign_has_unique_detail_page(tmp_path):
             assert f'<p class="cam-lede">Description {i}</p>' in page
             assert link in archive.namelist()
     assert not result["validation"]["errors"]
+
+
+def test_logo_conversion_preserves_svg_and_embeds_raster(tmp_path):
+    import base64
+    import xml.etree.ElementTree as ET
+    from backend.services.asset_service import save_logo_as_svg
+    svg = b'<svg xmlns="http://www.w3.org/2000/svg" width="300" height="60"><path fill="red" d="M0 0h30v30z"/></svg>'
+    result = save_logo_as_svg('data:image/svg+xml;base64,' + base64.b64encode(svg).decode(), str(tmp_path))
+    root = ET.parse(result).getroot()
+    assert root.get('viewBox') == '0 0 300.0 60.0'
+    assert root.find('{http://www.w3.org/2000/svg}path') is not None
+    raster = tmp_path / 'upload.png'
+    raster.write_bytes(b'raster-test-content')
+    result = save_logo_as_svg(str(raster), str(tmp_path / 'raster'))
+    image = ET.parse(result).getroot().find('{http://www.w3.org/2000/svg}image')
+    assert base64.b64decode(image.get('href').split(',')[1]) == raster.read_bytes()
+    assert Path(result).suffix == '.svg'

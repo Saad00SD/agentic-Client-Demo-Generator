@@ -157,6 +157,9 @@ export default function Dashboard() {
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Generation failed");
+      if (Array.isArray(data.executionLog)) {
+        setGenLogs((prev) => [...prev, ...data.executionLog]);
+      }
       setResult({
         projectId: data.projectId,
         status: data.status,
