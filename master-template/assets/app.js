@@ -26,7 +26,7 @@ function getLang(){
     if(v && typeof LANGS !== 'undefined' && LANGS.some(l => l.code === v)) return v;
   }
   catch(e){ /* private window, or storage blocked */ }
-  return 'en';
+  return (window.CLIENT_CONFIG || {}).defaultLanguage || 'en';
 }
 
 /* The dictionary and pattern list for a language code, or null for English and
@@ -83,48 +83,54 @@ function trString(s, code){
 
 const I18N_ATTRS = ['placeholder','aria-label','title','alt','label'];
 
+const _renderedText = new WeakMap();
+const _renderedAttr = new WeakMap();
+let clientTextObserver;
+
 function applyLang(){
+  // Ignore our own writes, but pick up later modal, game and dashboard updates.
+  if (clientTextObserver) clientTextObserver.disconnect();
   const code = getLang();
-  const foreign = code !== 'en';
   document.documentElement.lang = langTag(code);
-
-  const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-  const nodes = [];
-  let n; while(n = walk.nextNode()) nodes.push(n);
-
-  for(const node of nodes){
-    if(node.parentElement && node.parentElement.closest('script,style')) continue;
-    if(!_origText.has(node)) _origText.set(node, node.textContent);
-    const en = _origText.get(node);
-    if(!foreign){ if(node.textContent !== en) node.textContent = en; continue; }
-    let t = null;
-    /* One bad rule must never leave the rest of the page in English. */
-    try { t = trString(en, code); } catch(e){ t = null; }
-    if(t !== null){
-      /* keep whatever leading and trailing whitespace the markup had */
-      const lead = (en.match(/^\s*/) || [''])[0];
-      const tail = (en.match(/\s*$/) || [''])[0];
-      const next = lead + t + tail;
-      if(node.textContent !== next) node.textContent = next;
-    } else if(node.textContent !== en){ node.textContent = en; }
-  }
-
-  document.querySelectorAll('[placeholder],[aria-label],[title],[alt],optgroup[label]').forEach(el=>{
-    let store = _origAttr.get(el);
-    if(!store){ store = {}; _origAttr.set(el, store); }
-    for(const a of I18N_ATTRS){
-      if(!el.hasAttribute(a)) continue;
-      if(!(a in store)) store[a] = el.getAttribute(a);
-      const en = store[a];
-      if(!foreign){ el.setAttribute(a, en); continue; }
-      let t = null;
-      try { t = trString(en, code); } catch(e){ t = null; }
-      el.setAttribute(a, t !== null ? t : en);
+  const render = en => {
+    let translated = null;
+    try { translated = trString(en, code); } catch(e) { /* retain source */ }
+    const lead = (en.match(/^\s*/) || [''])[0];
+    const tail = (en.match(/\s*$/) || [''])[0];
+    return clientText(translated === null ? en : lead + translated + tail);
+  };
+  const walk = document.createTreeWalker(document.documentElement, NodeFilter.SHOW_TEXT);
+  let node;
+  while ((node = walk.nextNode())) {
+    if (node.parentElement && node.parentElement.closest('script,style,textarea,input')) continue;
+    if (!_origText.has(node) || node.textContent !== _renderedText.get(node)) {
+      _origText.set(node, node.textContent);
     }
+    const next = render(_origText.get(node));
+    if (node.textContent !== next) node.textContent = next;
+    _renderedText.set(node, next);
+  }
+  document.querySelectorAll('[placeholder],[aria-label],[title],[alt],optgroup[label]').forEach(el => {
+    const source = _origAttr.get(el) || {};
+    const rendered = _renderedAttr.get(el) || {};
+    for (const attr of I18N_ATTRS) {
+      if (!el.hasAttribute(attr)) continue;
+      const current = el.getAttribute(attr);
+      if (!(attr in source) || current !== rendered[attr]) source[attr] = current;
+      const next = render(source[attr]);
+      if (current !== next) el.setAttribute(attr, next);
+      rendered[attr] = next;
+    }
+    _origAttr.set(el, source);
+    _renderedAttr.set(el, rendered);
   });
-
-  document.querySelectorAll('[data-lang-btn]').forEach(b=>
+  document.querySelectorAll('[data-lang-btn]').forEach(b =>
     b.classList.toggle('on', b.dataset.langBtn === code));
+  if (!clientTextObserver) clientTextObserver = new MutationObserver(applyLang);
+  clientTextObserver.observe(document.documentElement, {
+    subtree: true, childList: true, characterData: true,
+    attributes: true, attributeFilter: I18N_ATTRS
+  });
 }
 
 function langSwitch(){
@@ -198,52 +204,53 @@ function applyBranding() {
   if (b.pageBgColor) root.setProperty('--grey-30', b.pageBgColor);
 }
 
+// Replace display text only: URLs, asset filenames and internal network keys stay intact.
+// A single pass keeps replacement values literal, even when they contain template words.
+function clientText(text) {
+  const cfg = window.CLIENT_CONFIG || {};
+  const country = cfg.country || {};
+  const name = country.name || (cfg.countryConfig || {}).country;
+  const programme = [cfg.clientName, cfg.platformName].filter(Boolean);
+  const title = cfg.clientName && cfg.platformName && cfg.clientName.endsWith(' ' + cfg.platformName)
+    ? cfg.clientName : programme.join(' ');
+  const values = {
+    'XPENG Vector': title,
+    'XPENG': cfg.clientName,
+    'Vector': cfg.platformName,
+    'Drive the Future': cfg.tagline,
+    'United Kingdom': name,
+    'UK': country.code || name,
+    'GBP': country.currency,
+    '\u00a3': country.symbol,
+    'Vereinigtes K\u00f6nigreich': name,
+    'Vereinigten K\u00f6nigreich': name,
+    'Verenigd Koninkrijk': name,
+    'Royaume-Uni': name,
+    'Wielka Brytania': name,
+    'Wielkiej Brytanii': name,
+    'VK': country.code || name,
+    'British': name,
+    'britische': name,
+    'Britse': name,
+    'britannique': name,
+    'britanniques': name,
+    'brytyjski': name,
+    'brytyjskiej': name,
+    'brytyjskich': name
+  };
+  return text.replace(/XPENG Vector|(?<![a-zA-Z])XPENG(?![a-zA-Z])|(?<![a-zA-Z])Vector(?![a-zA-Z])|Drive the Future|United Kingdom|Vereinigtes K\u00f6nigreich|Vereinigten K\u00f6nigreich|Verenigd Koninkrijk|Royaume-Uni|Wielka Brytania|Wielkiej Brytanii|\bUK\b|\bVK\b|\bGBP\b|\bBritish\b|\bbritische\b|\bBritse\b|\bbritanniques?\b|\bbrytyjski(?:ej|ch)?\b|\u00a3/gi,
+    token => values[Object.keys(values).find(key => key.toLowerCase() === token.toLowerCase())] || token);
+}
+
 function applyClientTextReplacement() {
   const cfg = window.CLIENT_CONFIG || {};
-  const clientName = cfg.clientName;
-  const platformName = cfg.platformName;
-  const tagline = cfg.tagline;
-
-  if (cfg.branding) {
-    applyBranding();
-  }
-
-  if (!clientName || clientName === "XPENG UK" || clientName === "XPENG") return;
-
-  if (document.title && document.title.includes("XPENG")) {
-    document.title = document.title.replace(/XPENG\s*UK/gi, clientName).replace(/XPENG/gi, clientName);
-  }
-
+  applyBranding();
   document.querySelectorAll('.client-platform-tag').forEach(el => {
-    if (platformName) el.textContent = platformName.toUpperCase();
+    if (cfg.platformName) el.textContent = cfg.platformName.toUpperCase();
   });
   document.querySelectorAll('.client-tagline-tag').forEach(el => {
-    if (tagline) el.textContent = tagline;
+    if (cfg.tagline) el.textContent = cfg.tagline;
   });
-
-  // Update Programme selector dropdown in admin dashboard / console
-  document.querySelectorAll('select[aria-label="Programme"] option').forEach(opt => {
-    const pName = platformName ? `${clientName} ${platformName}` : clientName;
-    opt.textContent = pName;
-  });
-
-  const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-  const nodes = [];
-  let n; while(n = walk.nextNode()) nodes.push(n);
-
-  for (const node of nodes) {
-    if (node.parentElement && node.parentElement.closest('script,style,textarea,input')) continue;
-    let txt = node.textContent;
-    if (txt && (txt.includes("XPENG") || (platformName && txt.includes("Vector")))) {
-      let newTxt = txt.replace(/XPENG\s*UK/gi, clientName).replace(/XPENG/gi, clientName);
-      if (platformName && platformName !== "Vector") {
-        newTxt = newTxt.replace(/\bVector\b/gi, platformName);
-      }
-      if (node.textContent !== newTxt) {
-        node.textContent = newTxt;
-      }
-    }
-  }
 }
 
 /* ---------- shared chrome ---------------------------------- */
@@ -353,7 +360,7 @@ function footer(){
   const platformName = cfg.platformName || 'Vector';
   const tagline = cfg.tagline || 'Drive the Future';
   const logo = b.logo || 'assets/xpeng-lockup-dark.png';
-  const country = (cfg.countryConfig && cfg.countryConfig.country) || (cfg.country && cfg.country.name) || 'UK';
+  const country = (cfg.country && cfg.country.name) || (cfg.countryConfig && cfg.countryConfig.country) || 'UK';
 
   return `
   <footer class="foot">

@@ -624,12 +624,13 @@ const numTag = () => {
   const l = LANGS.find(x => x.code === getLang());
   return l ? l.tag : 'en-GB';
 };
-const money = n => '£' + Number(n).toLocaleString(numTag());
+const currencySymbol = () => ((window.CLIENT_CONFIG || {}).country || {}).symbol || '\u00a3';
+const money = n => currencySymbol() + Number(n).toLocaleString(numTag());
 const pts   = n => Number(n).toLocaleString(numTag());
 const ptsToCur = n => {
   const v = Math.abs(n);
   const dp = Number.isInteger(v) ? 0 : 2;
-  return '£' + v.toLocaleString(numTag(),{minimumFractionDigits:dp, maximumFractionDigits:2});
+  return currencySymbol() + v.toLocaleString(numTag(),{minimumFractionDigits:dp, maximumFractionDigits:2});
 };
 /* {network} and {networkSize} come from config so the generic modules stay
    free of prospect-type nouns. */
