@@ -140,6 +140,7 @@ def test_data_url_asset_generation():
                 "name": "Peugeot Winter Campaign",
                 "type": "Hit & Win",
                 "img": data_url_camp,
+                "heroImage": data_url_camp,
                 "blurb": "Special winter offer",
                 "status": "Active"
             }
@@ -155,6 +156,8 @@ def test_data_url_asset_generation():
     assert res["status"] in ["success", "warning"]
     assert res["config"]["branding"]["logo"] == "assets/client/logo.svg"
     assert res["config"]["campaigns"][0]["img"].startswith("assets/campaigns/")
+    assert res["config"]["campaigns"][0]["heroImage"] == res["config"]["campaigns"][0]["img"]
+    assert res["config"]["campaigns"][0]["tileImage"] == res["config"]["campaigns"][0]["img"]
     assert os.path.exists(os.path.join(res["output_dir"], res["config"]["branding"]["logo"]))
     assert os.path.exists(os.path.join(res["output_dir"], res["config"]["campaigns"][0]["img"]))
 
@@ -197,3 +200,32 @@ def test_logo_conversion_preserves_svg_and_embeds_raster(tmp_path):
     image = ET.parse(result).getroot().find('{http://www.w3.org/2000/svg}image')
     assert base64.b64decode(image.get('href').split(',')[1]) == raster.read_bytes()
     assert Path(result).suffix == '.svg'
+
+
+def test_homepage_inputs_are_rendered_and_packaged(tmp_path):
+    import base64
+    import zipfile
+    image_bytes = b"homepage-image-content"
+    result = generate_demo({
+        "homepage": {
+            "title": "Drive <further> & earn",
+            "description": "Your rewards <script>alert(1)</script>",
+            "heroImage": "data:image/png;base64," + base64.b64encode(image_bytes).decode(),
+        }
+    }, MASTER_TEMPLATE_DIR, str(tmp_path / "homepage-demo"))
+    output = Path(result["output_dir"])
+    home = (output / "index.html").read_text(encoding="utf-8")
+    assert "<h1>Drive &lt;further&gt; &amp; earn</h1>" in home
+    assert "Your rewards &lt;script&gt;alert(1)&lt;/script&gt;" in home
+    assert '<div class="hero-media"><img src="assets/homepage/hero.png"' in home
+    assert (output / "assets/homepage/hero.png").read_bytes() == image_bytes
+    assert result["config"]["homepage"]["heroImage"] == "assets/homepage/hero.png"
+    assert 'class="hero-media"' not in (output / "shop.html").read_text(encoding="utf-8")
+    with zipfile.ZipFile(result["zip_path"]) as archive:
+        assert archive.read("assets/homepage/hero.png") == image_bytes
+
+
+def test_homepage_empty_image_uses_template(tmp_path):
+    result = generate_demo({"homepage": {"heroImage": ""}}, MASTER_TEMPLATE_DIR, str(tmp_path / "default-home"))
+    home = (Path(result["output_dir"]) / "index.html").read_text(encoding="utf-8")
+    assert '<div class="hero-media"><img src="assets/img/handover-keys.jpg"' in home

@@ -73,6 +73,7 @@ export interface ClientConfig {
   countryConfig: GeographicConfig;
   languages: LanguageConfig[];
   customer: CustomerConfig;
+  homepage: { title: string; description: string; heroImage: string };
   campaigns: CampaignConfig[];
 }
 

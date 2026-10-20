@@ -42,6 +42,19 @@ def generate_demo(
         dest_logo = save_logo_as_svg(uploaded_assets["logo"], str(target_path / "assets" / "client"))
         config_dict["branding"]["logo"] = f"assets/client/{os.path.basename(dest_logo)}"
 
+    homepage = config_dict["homepage"]
+    homepage["heroImage"] = homepage["heroImage"] or "assets/img/handover-keys.jpg"
+    hero_image = homepage["heroImage"]
+    if hero_image.startswith("data:"):
+        saved_image = save_data_url_asset(hero_image, str(target_path / "assets" / "homepage"), "hero")
+        homepage["heroImage"] = f"assets/homepage/{os.path.basename(saved_image)}"
+    home_path = target_path / "index.html"
+    home_html = home_path.read_text(encoding="utf-8")
+    home_html = re.sub(r"(<h1[^>]*>).*?(</h1>)", lambda m: m[1] + escape(homepage["title"]) + m[2], home_html, count=1, flags=re.S)
+    home_html = re.sub(r'(<p class="hero-lede">).*?(</p>)', lambda m: m[1] + escape(homepage["description"]) + m[2], home_html, count=1, flags=re.S)
+    home_html = re.sub(r'(<div class="hero-media"><img src=")[^"]*', lambda m: m[1] + escape(homepage["heroImage"], quote=True), home_html, count=1)
+    home_path.write_text(home_html, encoding="utf-8")
+
     campaigns = config_dict.get("campaigns", [])
     detail_pages = ["first-time-fix.html", "service-league.html", "genuine-parts.html", "ev-service-ready.html", "next-service-booked.html"]
     for idx, camp in enumerate(campaigns):
@@ -59,11 +72,15 @@ def generate_demo(
             rel_path = f"assets/campaigns/{os.path.basename(dest_img)}"
             camp["img"] = rel_path
             camp["tileImage"] = rel_path
+            if camp.get("heroImage") == img_val:
+                camp["heroImage"] = rel_path
         elif uploaded_assets and key in uploaded_assets and os.path.exists(uploaded_assets[key]):
             dest_img = copy_asset(uploaded_assets[key], str(target_path / "assets" / "campaigns"))
             rel_path = f"assets/campaigns/{os.path.basename(dest_img)}"
             camp["img"] = rel_path
             camp["tileImage"] = rel_path
+            if camp.get("heroImage") == img_val:
+                camp["heroImage"] = rel_path
 
     # 4. Write generated assets/config.js
     config_js_path = target_path / "assets" / "config.js"

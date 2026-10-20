@@ -248,6 +248,8 @@ p{margin:0 0 1em}
 .fav span.buy{font-size:11px;color:var(--black);background:var(--citrus);padding:3px 9px;border-radius:5px;font-weight:700}
 .rail-photo{border-radius:var(--r);overflow:hidden;aspect-ratio:4/3}
 .rail-photo img{width:100%;height:100%;object-fit:cover}
+.rail-photo-natural{aspect-ratio:auto}
+.rail-photo-natural img{display:block;height:auto}
 
 /* ================= CAMPAIGN PAGE (Équipe framework) ============== */
 .cam-hero{background:var(--black);color:var(--on-dark)}
@@ -1083,3 +1085,6 @@ p{margin:0 0 1em}
   .adopt-figs{gap:22px}
   .adopt-figs b{font-size:25px}
 }
+
+/* Preserve uploaded campaign compositions in cards, carousels and detail pages. */
+.slide-kv img[src*="assets/campaigns/"],.ccard-img img[src*="assets/campaigns/"],.rcard-img img[src*="assets/campaigns/"],.keyvis img[src*="assets/campaigns/"]{object-fit:contain;background:#fff}

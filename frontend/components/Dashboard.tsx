@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import {
   Layers,
   Globe,
-  Languages as LangIcon,
+  Home,
   Megaphone,
   CheckCircle2,
   AlertCircle,
@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { ClientConfig, CampaignConfig, GenerationResult } from "../types";
 import PreviewModal from "./PreviewModal";
+import CampaignImageEditor from "./CampaignImageEditor";
 
 const API_BASE = "http://localhost:8000/api";
 
@@ -65,6 +66,11 @@ const DEFAULT_CONFIG: ClientConfig = {
     branch: "Bucharest Central",
     since: "March 2021",
     profile: "Independent · 4 ramps · 6 staff"
+  },
+  homepage: {
+    title: "Every car they drive moves you up",
+    description: "Your month, your targets and your rewards in one place. Points are credited when the drive is logged, so what you see here is what actually happened.",
+    heroImage: ""
   },
   campaigns: [
     {
@@ -110,11 +116,12 @@ export default function Dashboard() {
   const [config, setConfig] = useState<ClientConfig>(DEFAULT_CONFIG);
   const [rawRegions, setRawRegions] = useState<string>(DEFAULT_CONFIG.countryConfig.regions.join(", "));
   const [rawBranches, setRawBranches] = useState<string>(DEFAULT_CONFIG.countryConfig.branches.join(", "));
-  const [activeTab, setActiveTab] = useState<"client" | "country" | "languages" | "campaigns">("client");
+  const [activeTab, setActiveTab] = useState<"client" | "country" | "homepage" | "campaigns">("client");
   const [isGenerating, setIsGenerating] = useState(false);
   const [genLogs, setGenLogs] = useState<string[]>([]);
   const [result, setResult] = useState<GenerationResult | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [imageEditor, setImageEditor] = useState<{ id: string; source: string } | null>(null);
 
   const handleLogoFileUpload = (file: File) => {
     const reader = new FileReader();
@@ -132,11 +139,7 @@ export default function Dashboard() {
     reader.onload = (e) => {
       const dataUrl = e.target?.result as string;
       if (dataUrl) {
-        setConfig((prev) => {
-          const updated = [...prev.campaigns];
-          updated[idx] = { ...updated[idx], img: dataUrl, tileImage: dataUrl };
-          return { ...prev, campaigns: updated };
-        });
+        setImageEditor({ id: config.campaigns[idx].id, source: dataUrl });
       }
     };
     reader.readAsDataURL(file);
@@ -188,16 +191,6 @@ export default function Dashboard() {
       ...prev,
       country: { ...prev.country, [field]: val }
     }));
-  };
-
-  const toggleLanguage = (langCode: string, label: string) => {
-    setConfig((prev) => {
-      const exists = prev.languages.some((l) => l.code === langCode);
-      const newLangs = exists
-        ? prev.languages.filter((l) => l.code !== langCode)
-        : [...prev.languages, { code: langCode, label }];
-      return { ...prev, languages: newLangs.length ? newLangs : [{ code: "en", label: "English" }] };
-    });
   };
 
   const addCampaign = () => {
@@ -271,18 +264,18 @@ export default function Dashboard() {
                 <Palette className="w-4 h-4" /> Client & Branding
               </button>
               <button
+                onClick={() => setActiveTab("homepage")}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs font-semibold rounded-lg transition ${activeTab === "homepage" ? "bg-blue-600 text-white shadow" : "text-gray-400 hover:text-white"
+                  }`}
+              >
+                <Home className="w-4 h-4" /> Homepage
+              </button>
+              <button
                 onClick={() => setActiveTab("country")}
                 className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs font-semibold rounded-lg transition ${activeTab === "country" ? "bg-blue-600 text-white shadow" : "text-gray-400 hover:text-white"
                   }`}
               >
                 <Globe className="w-4 h-4" /> Country & Geography
-              </button>
-              <button
-                onClick={() => setActiveTab("languages")}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs font-semibold rounded-lg transition ${activeTab === "languages" ? "bg-blue-600 text-white shadow" : "text-gray-400 hover:text-white"
-                  }`}
-              >
-                <LangIcon className="w-4 h-4" /> Languages (i18n)
               </button>
               <button
                 onClick={() => setActiveTab("campaigns")}
@@ -515,43 +508,35 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* TAB 3: Languages (i18n) */}
-            {activeTab === "languages" && (
+            {activeTab === "homepage" && (
               <div className="glass-panel p-6 flex flex-col gap-5">
-                <h3 className="text-base font-semibold text-white border-b border-gray-800 pb-3 flex items-center gap-2">
-                  <LangIcon className="w-4 h-4 text-indigo-400" /> Supported Platform Languages
-                </h3>
-
-                <p className="text-xs text-gray-400">
-                  Select which languages should appear in the dynamic header language picker for this demo.
-                </p>
-
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {[
-                    { code: "en", label: "English" },
-                    { code: "ro", label: "Română" },
-                    { code: "fr", label: "Français" },
-                    { code: "de", label: "Deutsch" },
-                    { code: "es", label: "Español" },
-                    { code: "ar", label: "العربية" }
-                  ].map((l) => {
-                    const isSelected = config.languages.some((x) => x.code === l.code);
-                    return (
-                      <button
-                        key={l.code}
-                        type="button"
-                        onClick={() => toggleLanguage(l.code, l.label)}
-                        className={`p-3 rounded-xl border flex items-center justify-between text-sm transition ${isSelected
-                            ? "bg-blue-600/20 border-blue-500 text-white"
-                            : "bg-gray-950 border-gray-800 text-gray-400 hover:border-gray-700"
-                          }`}
-                      >
-                        <span className="font-medium">{l.label} ({l.code})</span>
-                        {isSelected && <CheckCircle2 className="w-4 h-4 text-blue-400" />}
-                      </button>
-                    );
-                  })}
+                <h3 className="text-base font-semibold text-white border-b border-gray-800 pb-3">Homepage</h3>
+                <label className="text-sm text-gray-300">Hero title
+                  <input value={config.homepage.title} onChange={e => setConfig(prev => ({ ...prev, homepage: { ...prev.homepage, title: e.target.value } }))} className="w-full mt-2 bg-gray-900 border border-gray-700 rounded-lg p-3 text-white" />
+                </label>
+                <label className="text-sm text-gray-300">Hero description
+                  <textarea rows={4} value={config.homepage.description} onChange={e => setConfig(prev => ({ ...prev, homepage: { ...prev.homepage, description: e.target.value } }))} className="w-full mt-2 bg-gray-900 border border-gray-700 rounded-lg p-3 text-white" />
+                </label>
+                <div className="flex flex-col items-start gap-3">
+                  <span className="text-sm text-gray-300">Hero background image</span>
+                  <label className="cursor-pointer bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition shadow-lg flex items-center gap-2">
+                    <Upload className="w-4 h-4" /> Import Hero Image File
+                  <input type="file" accept="image/*" className="hidden" onChange={e => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = () => setConfig(prev => ({ ...prev, homepage: { ...prev.homepage, heroImage: reader.result as string } }));
+                      reader.readAsDataURL(file);
+                    }
+                    e.target.value = "";
+                  }} />
+                </label>
                 </div>
+                <p className="text-xs text-gray-400">Upload an image to replace the homepage background. Wide images work best.</p>
+                {config.homepage.heroImage && <>
+                  <img src={config.homepage.heroImage} alt="Homepage background preview" className="w-full max-h-64 object-contain rounded-lg bg-gray-950" />
+                  <button type="button" onClick={() => setConfig(prev => ({ ...prev, homepage: { ...prev.homepage, heroImage: "" } }))} className="text-sm text-blue-400 self-start">Use template image</button>
+                </>}
               </div>
             )}
 
@@ -593,7 +578,7 @@ export default function Dashboard() {
                           <label className="text-xs font-medium text-gray-300">Campaign Image</label>
                           <div className="w-full h-32 rounded-xl bg-gray-900 border border-gray-700 overflow-hidden relative group flex items-center justify-center">
                             {camp.img ? (
-                              <img src={camp.img} alt={camp.name} className="w-full h-full object-cover" />
+                              <img src={camp.img} alt={camp.name} className="w-full h-full object-contain" />
                             ) : (
                               <Megaphone className="w-8 h-8 text-gray-600" />
                             )}
@@ -607,9 +592,13 @@ export default function Dashboard() {
                               onChange={(e) => {
                                 const file = e.target.files?.[0];
                                 if (file) handleCampaignImageUpload(idx, file);
+                                e.target.value = "";
                               }}
                             />
                           </label>
+                          {camp.img?.startsWith("data:") && (
+                            <button type="button" onClick={() => setImageEditor({ id: camp.id, source: camp.img })} className="text-xs text-blue-400 underline">Adjust image</button>
+                          )}
                         </div>
 
                         {/* Campaign Details Form */}
@@ -783,6 +772,19 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
+
+      {imageEditor && (
+        <CampaignImageEditor
+          source={imageEditor.source}
+          onClose={() => setImageEditor(null)}
+          onSave={(image) => {
+            setConfig(prev => ({ ...prev, campaigns: prev.campaigns.map(camp =>
+              camp.id === imageEditor.id ? { ...camp, img: image, tileImage: image, heroImage: image } : camp
+            ) }));
+            setImageEditor(null);
+          }}
+        />
+      )}
 
       {/* Embedded Live Preview Modal */}
       {result && (

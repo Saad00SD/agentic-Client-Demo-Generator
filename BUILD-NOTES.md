@@ -125,7 +125,7 @@ pages.** Phil's first pass at the restyle only reached the home hero and the new
 the Shop page and the Campaigns hub run their own hero/carousel, which still showed generic
 stock (`demonstrator.jpg`, `drive-handover.jpg`). `shop.html`'s hero background is now
 `xpeng-china-track-day.jpg` and its "Today's top pick" thumb (copy already mentions "a track
-day for two, or a place on the brand home visit") is now `xpeng-china-production-milestone.jpg`
+day for two, or a place on the brand home visit") is now `shop_img1.jpg`
 — the China visit photo pairs directly with "brand home visit". `campaigns.html`'s first slide,
 the literal Test Drive campaign, now carries the track day photo too, matching the same pairing
 already used on the home hero. `index.html`, `shop.html` and `campaigns.html` are the only three

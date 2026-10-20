@@ -391,7 +391,7 @@ const DEMO = {
       img:'assets/img/xpeng-china-track-day.jpg',
       note:'A UK circuit, tuition included' },
     { n:'Brand home visit, China', t:'Signature', p:900, icon:'plant',
-      img:'assets/img/xpeng-china-production-milestone.jpg',
+      img:'assets/img/shop_img1.jpg',
       note:'Four places a quarter, travel included' }
   ],
 

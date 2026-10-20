@@ -59,6 +59,11 @@ class CustomerConfig(BaseModel):
     since: str = "January 2021"
     profile: str = "Independent · 5 ramps · 8 staff"
 
+class HomepageConfig(BaseModel):
+    title: str = "Every car they drive moves you up"
+    description: str = "Your month, your targets and your rewards in one place. Points are credited when the drive is logged, so what you see here is what actually happened."
+    heroImage: str = "assets/img/handover-keys.jpg"
+
 class ClientConfig(BaseModel):
     clientName: str = "Renault"
     platformName: str = "Pulse"
@@ -72,4 +77,5 @@ class ClientConfig(BaseModel):
         LanguageConfig(code="ro", label="Română")
     ])
     customer: CustomerConfig = Field(default_factory=CustomerConfig)
+    homepage: HomepageConfig = Field(default_factory=HomepageConfig)
     campaigns: List[CampaignConfig] = Field(default_factory=list)
