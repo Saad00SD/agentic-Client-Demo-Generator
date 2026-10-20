@@ -242,7 +242,7 @@ export default function Dashboard() {
                 Client Demo Generator
 
               </h1>
-              <p className="text-xs text-gray-400">One Master Template + Structured Configuration = Custom Demos</p>
+              {/* <p className="text-xs text-gray-400">One Master Template + Structured Configuration = Custom Demos</p> */}
             </div>
           </div>
 
@@ -265,33 +265,29 @@ export default function Dashboard() {
             <div className="flex border-b border-gray-800 bg-gray-950/60 p-1 rounded-xl">
               <button
                 onClick={() => setActiveTab("client")}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs font-semibold rounded-lg transition ${
-                  activeTab === "client" ? "bg-blue-600 text-white shadow" : "text-gray-400 hover:text-white"
-                }`}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs font-semibold rounded-lg transition ${activeTab === "client" ? "bg-blue-600 text-white shadow" : "text-gray-400 hover:text-white"
+                  }`}
               >
                 <Palette className="w-4 h-4" /> Client & Branding
               </button>
               <button
                 onClick={() => setActiveTab("country")}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs font-semibold rounded-lg transition ${
-                  activeTab === "country" ? "bg-blue-600 text-white shadow" : "text-gray-400 hover:text-white"
-                }`}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs font-semibold rounded-lg transition ${activeTab === "country" ? "bg-blue-600 text-white shadow" : "text-gray-400 hover:text-white"
+                  }`}
               >
                 <Globe className="w-4 h-4" /> Country & Geography
               </button>
               <button
                 onClick={() => setActiveTab("languages")}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs font-semibold rounded-lg transition ${
-                  activeTab === "languages" ? "bg-blue-600 text-white shadow" : "text-gray-400 hover:text-white"
-                }`}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs font-semibold rounded-lg transition ${activeTab === "languages" ? "bg-blue-600 text-white shadow" : "text-gray-400 hover:text-white"
+                  }`}
               >
                 <LangIcon className="w-4 h-4" /> Languages (i18n)
               </button>
               <button
                 onClick={() => setActiveTab("campaigns")}
-                className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs font-semibold rounded-lg transition ${
-                  activeTab === "campaigns" ? "bg-blue-600 text-white shadow" : "text-gray-400 hover:text-white"
-                }`}
+                className={`flex-1 flex items-center justify-center gap-2 py-3 text-xs font-semibold rounded-lg transition ${activeTab === "campaigns" ? "bg-blue-600 text-white shadow" : "text-gray-400 hover:text-white"
+                  }`}
               >
                 <Megaphone className="w-4 h-4" /> Campaigns ({config.campaigns.length})
               </button>
@@ -545,11 +541,10 @@ export default function Dashboard() {
                         key={l.code}
                         type="button"
                         onClick={() => toggleLanguage(l.code, l.label)}
-                        className={`p-3 rounded-xl border flex items-center justify-between text-sm transition ${
-                          isSelected
+                        className={`p-3 rounded-xl border flex items-center justify-between text-sm transition ${isSelected
                             ? "bg-blue-600/20 border-blue-500 text-white"
                             : "bg-gray-950 border-gray-800 text-gray-400 hover:border-gray-700"
-                        }`}
+                          }`}
                       >
                         <span className="font-medium">{l.label} ({l.code})</span>
                         {isSelected && <CheckCircle2 className="w-4 h-4 text-blue-400" />}

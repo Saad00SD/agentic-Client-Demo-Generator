@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Client Demo Generator",
+  title: "Client Demo Generator Agent",
   description: "Generate customized client demo websites from your entered details and the existing master template.",
 };
 
