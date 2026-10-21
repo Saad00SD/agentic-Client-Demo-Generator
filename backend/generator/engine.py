@@ -82,6 +82,28 @@ def generate_demo(
             if camp.get("heroImage") == img_val:
                 camp["heroImage"] = rel_path
 
+    # Apply browser-tab branding to every generated page, including campaign pages.
+    favicon = config_dict.get("branding", {}).get("logo", "")
+    if branding_logo.startswith("data:") and not branding_logo.startswith("data:image/svg+xml"):
+        # Keep raster icons native: browser favicons cannot reliably render embedded SVG images.
+        favicon_path = save_data_url_asset(branding_logo, str(target_path / "assets" / "client"), "favicon")
+        favicon = f"assets/client/{os.path.basename(favicon_path)}"
+    elif uploaded_assets and "logo" in uploaded_assets:
+        uploaded_logo = uploaded_assets["logo"]
+        if os.path.exists(uploaded_logo) and Path(uploaded_logo).suffix.lower() != ".svg":
+            favicon_path = copy_asset(uploaded_logo, str(target_path / "assets" / "client"), "favicon" + Path(uploaded_logo).suffix.lower())
+            favicon = f"assets/client/{os.path.basename(favicon_path)}"
+    tab_name = escape(f"{config_dict['clientName']} {config_dict['platformName']}".strip())
+    for page in target_path.rglob("*.html"):
+        html = page.read_text(encoding="utf-8")
+        html = re.sub(r"(<title[^>]*>)XPENG Vector", lambda match: match[1] + tab_name, html, flags=re.I)
+        if favicon:
+            icon_url = os.path.relpath(target_path / favicon, page.parent).replace(os.sep, "/")
+            icon_tag = f'<link rel="icon" href="{escape(icon_url, quote=True)}">'
+            html = re.sub(r"<link\b[^>]*>", lambda match: "" if re.search(r"\brel\s*=\s*[\"'](?:shortcut\s+)?icon[\"']", match[0], re.I) else match[0], html, flags=re.I)
+            html = re.sub(r"</head\s*>", lambda match: icon_tag + "\n" + match[0], html, count=1, flags=re.I)
+        page.write_text(html, encoding="utf-8")
+
     # 4. Write generated assets/config.js
     config_js_path = target_path / "assets" / "config.js"
     os.makedirs(config_js_path.parent, exist_ok=True)

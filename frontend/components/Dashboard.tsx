@@ -14,6 +14,8 @@ import {
   Plus,
   Trash2,
   Upload,
+  ImagePlus,
+  Move,
   Palette,
   MapPin,
   RefreshCw,
@@ -85,7 +87,7 @@ const DEFAULT_CONFIG: ClientConfig = {
     {
       id: "varta",
       name: "Power Days Incentive",
-      type: "Hit & Win Incentive",
+      type: "",
       img: "assets/img/photo-shuttle-aisle.jpg",
       href: "varta-power-days.html",
       blurb: "Supplier funded. Points for every battery above baseline.",
@@ -94,7 +96,7 @@ const DEFAULT_CONFIG: ClientConfig = {
     {
       id: "brake",
       name: "Brake Focus Q4",
-      type: "Hit & Win Incentive",
+      type: "",
       img: "assets/img/photo-pickstation-portrait.jpg",
       href: "brake-focus.html",
       blurb: "Discs, pads and fluid, each with its own target.",
@@ -112,16 +114,43 @@ const DEFAULT_CONFIG: ClientConfig = {
   ]
 };
 
+const INITIAL_CONFIG: ClientConfig = {
+  ...DEFAULT_CONFIG,
+  clientName: "",
+  platformName: "",
+  tagline: "",
+  branding: { ...DEFAULT_CONFIG.branding, logo: "" },
+  country: { ...DEFAULT_CONFIG.country, code: "", name: "", symbol: "" },
+  countryConfig: { ...DEFAULT_CONFIG.countryConfig, country: "", regions: [], branches: [], defaultBranch: "" },
+  homepage: { title: "", description: "", heroImage: "" },
+  campaigns: DEFAULT_CONFIG.campaigns.map(campaign => ({
+    ...campaign, name: "", type: "", blurb: "", status: ""
+  }))
+};
+
 export default function Dashboard() {
-  const [config, setConfig] = useState<ClientConfig>(DEFAULT_CONFIG);
-  const [rawRegions, setRawRegions] = useState<string>(DEFAULT_CONFIG.countryConfig.regions.join(", "));
-  const [rawBranches, setRawBranches] = useState<string>(DEFAULT_CONFIG.countryConfig.branches.join(", "));
+  const [config, setConfig] = useState<ClientConfig>(INITIAL_CONFIG);
+  const [rawRegions, setRawRegions] = useState<string>("");
+  const [rawBranches, setRawBranches] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"client" | "country" | "homepage" | "campaigns">("client");
   const [isGenerating, setIsGenerating] = useState(false);
   const [genLogs, setGenLogs] = useState<string[]>([]);
   const [result, setResult] = useState<GenerationResult | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [imageEditor, setImageEditor] = useState<{ id: string; source: string } | null>(null);
+
+  const missingFields = [
+    ["Client Name", config.clientName],
+    ["Platform Name", config.platformName],
+    ["Tagline", config.tagline],
+    ["Client Logo", config.branding.logo],
+    ["Hero title", config.homepage.title],
+    ["Hero description", config.homepage.description],
+    ["Country Name", config.country.name],
+    ["Regions", config.countryConfig.regions.join("")],
+    ["Branches", config.countryConfig.branches.join("")]
+  ].filter(([, value]) => !value.trim()).map(([label]) => label);
+  const canGenerate = missingFields.length === 0;
 
   const handleLogoFileUpload = (file: File) => {
     const reader = new FileReader();
@@ -147,6 +176,7 @@ export default function Dashboard() {
 
   // Handle Generate Demo click
   const handleGenerate = async () => {
+    if (!canGenerate || isGenerating) return;
     setIsGenerating(true);
     setResult(null);
     setGenLogs(["Generating your demo from the master template and entered details..."]);
@@ -197,11 +227,11 @@ export default function Dashboard() {
     const newId = `camp-${crypto.randomUUID()}`;
     const newCamp: CampaignConfig = {
       id: newId,
-      name: `New Incentive #${config.campaigns.length + 1}`,
-      type: "Hit & Win Incentive",
+      name: "",
+      type: "",
       img: "assets/img/photo-goods-to-person.jpg",
-      blurb: "Earn bonus rewards on qualifying category lines.",
-      status: "Active"
+      blurb: "",
+      status: ""
     };
     setConfig((prev) => ({ ...prev, campaigns: [...prev.campaigns, newCamp] }));
   };
@@ -295,9 +325,11 @@ export default function Dashboard() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs font-medium text-gray-300">Client Name</label>
+                    <label className="text-xs font-medium text-gray-300">Client Name *</label>
                     <input
                       type="text"
+                      required
+                      placeholder={`e.g. ${DEFAULT_CONFIG.clientName}`}
                       value={config.clientName}
                       onChange={(e) => setConfig({ ...config, clientName: e.target.value })}
                       className="w-full mt-1 bg-gray-950 border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:border-blue-500 focus:outline-none"
@@ -305,9 +337,11 @@ export default function Dashboard() {
                   </div>
 
                   <div>
-                    <label className="text-xs font-medium text-gray-300">Platform / Demo Name</label>
+                    <label className="text-xs font-medium text-gray-300">Platform / Demo Name *</label>
                     <input
                       type="text"
+                      required
+                      placeholder={`e.g. ${DEFAULT_CONFIG.platformName}`}
                       value={config.platformName}
                       onChange={(e) => setConfig({ ...config, platformName: e.target.value })}
                       className="w-full mt-1 bg-gray-950 border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:border-blue-500 focus:outline-none"
@@ -316,9 +350,11 @@ export default function Dashboard() {
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-gray-300">Tagline / Slogan</label>
+                  <label className="text-xs font-medium text-gray-300">Tagline / Slogan *</label>
                   <input
                     type="text"
+                    required
+                    placeholder={`e.g. ${DEFAULT_CONFIG.tagline}`}
                     value={config.tagline}
                     onChange={(e) => setConfig({ ...config, tagline: e.target.value })}
                     className="w-full mt-1 bg-gray-950 border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:border-blue-500 focus:outline-none"
@@ -328,7 +364,7 @@ export default function Dashboard() {
                 {/* Client Logo Upload & Preview Section */}
                 <div className="border-t border-gray-800 pt-4 flex flex-col gap-3">
                   <label className="text-xs font-semibold text-gray-300 flex items-center justify-between">
-                    <span>Import Client Logo</span>
+                    <span>Import Client Logo *</span>
                     <span className="text-[10px] text-blue-400 font-normal">PNG, SVG, JPG, WebP supported</span>
                   </label>
 
@@ -356,16 +392,17 @@ export default function Dashboard() {
                             onChange={(e) => {
                               const file = e.target.files?.[0];
                               if (file) handleLogoFileUpload(file);
+                              e.target.value = "";
                             }}
                           />
                         </label>
                         {config.branding.logo && (
                           <button
                             type="button"
-                            onClick={() => updateBranding("logo", "assets/lkq-logo.svg")}
+                            onClick={() => updateBranding("logo", "")}
                             className="text-xs text-gray-400 hover:text-gray-200 px-3 py-2"
                           >
-                            Reset Default
+                            Remove Logo
                           </button>
                         )}
                       </div>
@@ -432,9 +469,11 @@ export default function Dashboard() {
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="text-xs font-medium text-gray-300">Country Name</label>
+                    <label className="text-xs font-medium text-gray-300">Country Name *</label>
                     <input
                       type="text"
+                      placeholder="e.g. Romania"
+                      required
                       value={config.country.name}
                       onChange={(e) => {
                         updateCountry("name", e.target.value);
@@ -451,6 +490,7 @@ export default function Dashboard() {
                     <label className="text-xs font-medium text-gray-300">Country Code</label>
                     <input
                       type="text"
+                      placeholder="e.g. RO"
                       value={config.country.code}
                       onChange={(e) => updateCountry("code", e.target.value.toUpperCase())}
                       className="w-full mt-1 bg-gray-950 border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:border-blue-500 focus:outline-none uppercase"
@@ -461,6 +501,7 @@ export default function Dashboard() {
                     <label className="text-xs font-medium text-gray-300">Currency Symbol</label>
                     <input
                       type="text"
+                      placeholder="e.g. RON"
                       value={config.country.symbol}
                       onChange={(e) => updateCountry("symbol", e.target.value)}
                       className="w-full mt-1 bg-gray-950 border border-gray-700 rounded-lg p-2.5 text-sm text-white focus:border-blue-500 focus:outline-none"
@@ -469,10 +510,11 @@ export default function Dashboard() {
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-gray-300">Regions (comma-separated)</label>
+                  <label className="text-xs font-medium text-gray-300">Regions (comma-separated) *</label>
                   <input
                     type="text"
-                    value={rawRegions}
+                    required
+                      value={rawRegions}
                     onChange={(e) => {
                       const val = e.target.value;
                       setRawRegions(val);
@@ -488,10 +530,11 @@ export default function Dashboard() {
                 </div>
 
                 <div>
-                  <label className="text-xs font-medium text-gray-300">Branches (comma-separated)</label>
+                  <label className="text-xs font-medium text-gray-300">Branches (comma-separated) *</label>
                   <input
                     type="text"
-                    value={rawBranches}
+                    required
+                      value={rawBranches}
                     onChange={(e) => {
                       const val = e.target.value;
                       setRawBranches(val);
@@ -511,11 +554,11 @@ export default function Dashboard() {
             {activeTab === "homepage" && (
               <div className="glass-panel p-6 flex flex-col gap-5">
                 <h3 className="text-base font-semibold text-white border-b border-gray-800 pb-3">Homepage</h3>
-                <label className="text-sm text-gray-300">Hero title
-                  <input value={config.homepage.title} onChange={e => setConfig(prev => ({ ...prev, homepage: { ...prev.homepage, title: e.target.value } }))} className="w-full mt-2 bg-gray-900 border border-gray-700 rounded-lg p-3 text-white" />
+                <label className="text-sm text-gray-300">Hero title *
+                  <input required placeholder={`e.g. ${DEFAULT_CONFIG.homepage.title}`} value={config.homepage.title} onChange={e => setConfig(prev => ({ ...prev, homepage: { ...prev.homepage, title: e.target.value } }))} className="w-full mt-2 bg-gray-900 border border-gray-700 rounded-lg p-3 text-white" />
                 </label>
-                <label className="text-sm text-gray-300">Hero description
-                  <textarea rows={4} value={config.homepage.description} onChange={e => setConfig(prev => ({ ...prev, homepage: { ...prev.homepage, description: e.target.value } }))} className="w-full mt-2 bg-gray-900 border border-gray-700 rounded-lg p-3 text-white" />
+                <label className="text-sm text-gray-300">Hero description *
+                  <textarea required placeholder={`e.g. ${DEFAULT_CONFIG.homepage.description}`} rows={4} value={config.homepage.description} onChange={e => setConfig(prev => ({ ...prev, homepage: { ...prev.homepage, description: e.target.value } }))} className="w-full mt-2 bg-gray-900 border border-gray-700 rounded-lg p-3 text-white" />
                 </label>
                 <div className="flex flex-col items-start gap-3">
                   <span className="text-sm text-gray-300">Hero background image</span>
@@ -577,10 +620,15 @@ export default function Dashboard() {
                         <div className="md:col-span-4 flex flex-col gap-2">
                           <label className="text-xs font-medium text-gray-300">Campaign Image</label>
                           <div className="w-full h-32 rounded-xl bg-gray-900 border border-gray-700 overflow-hidden relative group flex items-center justify-center">
-                            {camp.img ? (
-                              <img src={camp.img} alt={camp.name} className="w-full h-full object-contain" />
+                            {camp.img?.startsWith("data:") ? (
+                              <img src={camp.img} alt={camp.name || "Campaign image preview"} className="w-full h-full object-contain" />
                             ) : (
-                              <Megaphone className="w-8 h-8 text-gray-600" />
+                              <div className="flex flex-col items-center gap-2 text-gray-400">
+                                <div className="rounded-2xl bg-blue-500/10 p-3 ring-1 ring-blue-500/20">
+                                  <ImagePlus aria-hidden="true" className="w-7 h-7 text-blue-400" />
+                                </div>
+                                <span className="text-xs">Upload a campaign image</span>
+                              </div>
                             )}
                           </div>
                           <label className="cursor-pointer bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs font-medium px-3 py-2 rounded-lg transition text-center flex items-center justify-center gap-1.5 border border-gray-700">
@@ -597,7 +645,7 @@ export default function Dashboard() {
                             />
                           </label>
                           {camp.img?.startsWith("data:") && (
-                            <button type="button" onClick={() => setImageEditor({ id: camp.id, source: camp.img })} className="text-xs text-blue-400 underline">Adjust image</button>
+                            <button type="button" onClick={() => setImageEditor({ id: camp.id, source: camp.img })} className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-blue-500/20 bg-blue-500/10 px-3 py-2 text-xs text-blue-400 hover:bg-blue-500/20 transition"><Move aria-hidden="true" className="w-3.5 h-3.5" /> Adjust image</button>
                           )}
                         </div>
 
@@ -608,6 +656,7 @@ export default function Dashboard() {
                               <label className="text-xs font-medium text-gray-400">Campaign Title</label>
                               <input
                                 type="text"
+                                placeholder="e.g. Summer Sales Challenge"
                                 value={camp.name}
                                 onChange={(e) => updateCampaign(idx, "name", e.target.value)}
                                 className="w-full mt-1 bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-blue-500"
@@ -618,6 +667,7 @@ export default function Dashboard() {
                               <label className="text-xs font-medium text-gray-400">Incentive Type</label>
                               <input
                                 type="text"
+                                placeholder="e.g. Hit & Win Incentive"
                                 value={camp.type}
                                 onChange={(e) => updateCampaign(idx, "type", e.target.value)}
                                 className="w-full mt-1 bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-blue-500"
@@ -630,6 +680,7 @@ export default function Dashboard() {
                               <label className="text-xs font-medium text-gray-400">Short Description / Blurb</label>
                               <input
                                 type="text"
+                                placeholder="e.g. Earn bonus rewards on qualifying purchases."
                                 value={camp.blurb}
                                 onChange={(e) => updateCampaign(idx, "blurb", e.target.value)}
                                 className="w-full mt-1 bg-gray-900 border border-gray-700 rounded-lg p-2 text-xs text-white focus:outline-none focus:border-blue-500"
@@ -655,6 +706,12 @@ export default function Dashboard() {
               </div>
             )}
 
+            <p id="generation-requirements" aria-live="polite" className="text-xs text-gray-400">
+              {canGenerate
+                ? "All required fields are complete. Ready to generate your demo."
+                : `Required before generating: ${missingFields.join(", ")}. Complete these in Client & Branding, Homepage, and Country & Geography. Fields marked * are required.`}
+            </p>
+
             {/* Action Bar */}
             <div className="flex items-center justify-between bg-gray-950 p-4 rounded-xl border border-gray-800">
               <div className="text-xs text-gray-400">
@@ -663,8 +720,9 @@ export default function Dashboard() {
 
               <button
                 onClick={handleGenerate}
-                disabled={isGenerating}
-                className="px-8 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold text-sm rounded-xl transition shadow-xl shadow-emerald-600/30 flex items-center gap-2 disabled:opacity-50"
+                disabled={isGenerating || !canGenerate}
+                aria-describedby="generation-requirements"
+                className="px-8 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-bold text-sm rounded-xl transition shadow-xl shadow-emerald-600/30 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isGenerating ? (
                   <>
@@ -714,8 +772,10 @@ export default function Dashboard() {
                     className="p-2.5 rounded-lg text-xs font-medium flex items-center gap-2.5 overflow-hidden"
                     style={{ backgroundColor: "rgba(255,255,255,0.1)", color: "#ffffff" }}
                   >
-                    {config.campaigns[0].img && (
+                    {config.campaigns[0].img?.startsWith("data:") ? (
                       <img src={config.campaigns[0].img} alt="" className="w-10 h-10 rounded object-cover flex-shrink-0" />
+                    ) : (
+                      <ImagePlus aria-hidden="true" className="w-10 h-10 rounded bg-white/10 p-2 text-blue-400 flex-shrink-0" />
                     )}
                     <div className="flex-1 min-w-0">
                       <div className="truncate font-semibold">{config.campaigns[0].name}</div>

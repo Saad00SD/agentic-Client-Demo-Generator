@@ -240,3 +240,23 @@ def test_campaign_one_keeps_static_what_counts_images(tmp_path):
         "assets/img/drive-handover.jpg", "assets/img/detail-light.jpg",
         "assets/img/detail-charge.jpg", "assets/img/handover-keys.jpg",
     ]
+
+
+def test_uploaded_logo_is_browser_icon_on_every_page(tmp_path):
+    import base64
+    import re
+
+    logo = base64.b64decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=")
+    output = tmp_path / "branded-demo"
+    generate_demo({
+        "clientName": "Acme & Co", "platformName": "Rewards",
+        "branding": {"logo": "data:image/png;base64," + base64.b64encode(logo).decode()}
+    }, MASTER_TEMPLATE_DIR, str(output))
+    assert (output / "assets/client/favicon.png").read_bytes() == logo
+    for page in output.rglob("*.html"):
+        html = page.read_text(encoding="utf-8")
+        icons = re.findall(r'<link rel="icon" href="([^"]+)"', html)
+        assert len(icons) == 1, page
+        assert (page.parent / icons[0]).resolve() == (output / "assets/client/favicon.png").resolve()
+        assert "assets/favicon.png" not in html
+    assert "<title>Acme &amp; Co Rewards" in (output / "index.html").read_text(encoding="utf-8")
