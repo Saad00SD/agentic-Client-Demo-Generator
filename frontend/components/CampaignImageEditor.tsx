@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export default function CampaignImageEditor({ source, onSave, onClose }: {
+export default function CampaignImageEditor({ source, onSave, onClose, outputWidth = 1280, outputHeight = 720 }: {
+  outputWidth?: number; outputHeight?: number;
   source: string; onSave: (image: string) => void; onClose: () => void;
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -22,13 +23,13 @@ export default function CampaignImageEditor({ source, onSave, onClose }: {
   useEffect(() => {
     const context = canvas.current?.getContext("2d");
     if (!context || !image) return;
-    const scale = (mode === "fit" ? Math.min : Math.max)(1280 / image.naturalWidth, 720 / image.naturalHeight) * zoom;
+    const scale = (mode === "fit" ? Math.min : Math.max)(outputWidth / image.naturalWidth, outputHeight / image.naturalHeight) * zoom;
     const width = image.naturalWidth * scale;
     const height = image.naturalHeight * scale;
     context.fillStyle = "#ffffff";
-    context.fillRect(0, 0, 1280, 720);
-    context.drawImage(image, (1280 - width) * x / 100, (720 - height) * y / 100, width, height);
-  }, [image, mode, zoom, x, y]);
+    context.fillRect(0, 0, outputWidth, outputHeight);
+    context.drawImage(image, (outputWidth - width) * x / 100, (outputHeight - height) * y / 100, width, height);
+  }, [image, mode, zoom, x, y, outputWidth, outputHeight]);
   useEffect(() => {
     const handleKey = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
     document.addEventListener("keydown", handleKey);
@@ -39,7 +40,7 @@ export default function CampaignImageEditor({ source, onSave, onClose }: {
       <section role="dialog" aria-modal="true" aria-labelledby="image-editor-title" className="bg-gray-900 text-white rounded-xl p-5 w-full max-w-2xl max-h-[95vh] overflow-auto border border-gray-700">
         <h2 id="image-editor-title" className="text-lg font-semibold">Adjust campaign image</h2>
         <p className="text-sm text-gray-400 my-2">Fit keeps the entire image visible. Crop lets you choose which area to show. White space is included in the saved image.</p>
-        <canvas ref={canvas} width={1280} height={720} aria-label="Campaign image preview" className="w-full bg-white rounded-lg" />
+        <canvas ref={canvas} width={outputWidth} height={outputHeight} aria-label="Campaign image preview" className="w-full bg-white rounded-lg" />
         {error && <p role="alert" className="text-red-400">{error}</p>}
         <label className="block mt-4 text-sm">Image layout
           <select autoFocus value={mode} onChange={e => { setMode(e.target.value); setZoom(1); setX(50); setY(50); }} className="ml-3 bg-gray-800 p-2 rounded">

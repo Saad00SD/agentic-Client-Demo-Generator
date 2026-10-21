@@ -310,9 +310,9 @@ p{margin:0 0 1em}
 .howto h3{font-size:21px;margin-bottom:14px}
 .howto p, .howto li{font-size:13.6px;color:var(--text-dim)}
 .howto ul{margin:0 0 1em;padding-left:18px}
-.imgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.imgrid .im{border-radius:11px;overflow:hidden;aspect-ratio:4/3;background:var(--grey-50)}
-.imgrid .im img{width:100%;height:100%;object-fit:cover}
+.imgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;min-width:0}
+.imgrid .im{position:relative;min-width:0;border-radius:11px;overflow:hidden;aspect-ratio:4/3;background:var(--grey-50)}
+.imgrid .im img{position:absolute;inset:0;display:block;width:100%;height:100%;object-fit:cover}
 
 /* accordion (evidenced) */
 .acc-row{border-bottom:1px solid var(--line)}
@@ -618,7 +618,7 @@ p{margin:0 0 1em}
   .ladder-seg{padding:0 8px;font-size:10.5px}
   .ladder-nudge{position:static;display:inline-block;margin-bottom:12px}
   .marker-lbl{font-size:11px;padding:6px 10px}
-  .imgrid{grid-template-columns:1fr 1fr}
+  .imgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
   .panel{padding:20px 18px}
   .sbar-lab{width:58px;font-size:11.5px}
   .vbars{gap:12px}
@@ -1088,3 +1088,4 @@ p{margin:0 0 1em}
 
 /* Preserve uploaded campaign compositions in cards, carousels and detail pages. */
 .slide-kv img[src*="assets/campaigns/"],.ccard-img img[src*="assets/campaigns/"],.rcard-img img[src*="assets/campaigns/"],.keyvis img[src*="assets/campaigns/"]{object-fit:contain;background:#fff}
+

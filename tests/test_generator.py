@@ -229,3 +229,14 @@ def test_homepage_empty_image_uses_template(tmp_path):
     result = generate_demo({"homepage": {"heroImage": ""}}, MASTER_TEMPLATE_DIR, str(tmp_path / "default-home"))
     home = (Path(result["output_dir"]) / "index.html").read_text(encoding="utf-8")
     assert '<div class="hero-media"><img src="assets/img/handover-keys.jpg"' in home
+
+
+def test_campaign_one_keeps_static_what_counts_images(tmp_path):
+    result = generate_demo({"campaigns": [{"id": "first", "name": "First"}]}, MASTER_TEMPLATE_DIR, str(tmp_path / "static-counts"))
+    page = (Path(result["output_dir"]) / "campaign-1.html").read_text(encoding="utf-8")
+    import re
+    grid = re.search(r'<div class="imgrid">(.*?)</div>\s*</div>\s*</div>', page, re.S)[1]
+    assert re.findall(r'<img src="([^"]+)"', grid) == [
+        "assets/img/drive-handover.jpg", "assets/img/detail-light.jpg",
+        "assets/img/detail-charge.jpg", "assets/img/handover-keys.jpg",
+    ]
