@@ -137,7 +137,7 @@ export default function Dashboard() {
   const [genLogs, setGenLogs] = useState<string[]>([]);
   const [result, setResult] = useState<GenerationResult | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [imageEditor, setImageEditor] = useState<{ id: string; source: string } | null>(null);
+  const [imageEditor, setImageEditor] = useState<{ target: "hero"; source: string } | { target: "campaign"; id: string; source: string } | null>(null);
 
   const missingFields = [
     ["Client Name", config.clientName],
@@ -168,7 +168,7 @@ export default function Dashboard() {
     reader.onload = (e) => {
       const dataUrl = e.target?.result as string;
       if (dataUrl) {
-        setImageEditor({ id: config.campaigns[idx].id, source: dataUrl });
+        setImageEditor({ target: "campaign", id: config.campaigns[idx].id, source: dataUrl });
       }
     };
     reader.readAsDataURL(file);
@@ -568,16 +568,17 @@ export default function Dashboard() {
                     const file = e.target.files?.[0];
                     if (file) {
                       const reader = new FileReader();
-                      reader.onload = () => setConfig(prev => ({ ...prev, homepage: { ...prev.homepage, heroImage: reader.result as string } }));
+                      reader.onload = () => setImageEditor({ target: "hero", source: reader.result as string });
                       reader.readAsDataURL(file);
                     }
                     e.target.value = "";
                   }} />
                 </label>
                 </div>
-                <p className="text-xs text-gray-400">Upload an image to replace the homepage background. Wide images work best.</p>
+                <p className="text-xs text-gray-400">Upload an image, then crop, zoom, and drag to frame your hero background. Wide images work best. The visible area varies with screen size.</p>
                 {config.homepage.heroImage && <>
                   <img src={config.homepage.heroImage} alt="Homepage background preview" className="w-full max-h-64 object-contain rounded-lg bg-gray-950" />
+                  <button type="button" onClick={() => setImageEditor({ target: "hero", source: config.homepage.heroImage })} className="inline-flex items-center justify-center gap-1.5 self-start rounded-lg border border-blue-500/20 bg-blue-500/10 px-3 py-2 text-xs text-blue-400 hover:bg-blue-500/20 transition"><Move aria-hidden="true" className="w-3.5 h-3.5" /> Crop and adjust</button>
                   <button type="button" onClick={() => setConfig(prev => ({ ...prev, homepage: { ...prev.homepage, heroImage: "" } }))} className="text-sm text-blue-400 self-start">Use template image</button>
                 </>}
               </div>
@@ -645,7 +646,7 @@ export default function Dashboard() {
                             />
                           </label>
                           {camp.img?.startsWith("data:") && (
-                            <button type="button" onClick={() => setImageEditor({ id: camp.id, source: camp.img })} className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-blue-500/20 bg-blue-500/10 px-3 py-2 text-xs text-blue-400 hover:bg-blue-500/20 transition"><Move aria-hidden="true" className="w-3.5 h-3.5" /> Adjust image</button>
+                            <button type="button" onClick={() => setImageEditor({ target: "campaign", id: camp.id, source: camp.img })} className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-blue-500/20 bg-blue-500/10 px-3 py-2 text-xs text-blue-400 hover:bg-blue-500/20 transition"><Move aria-hidden="true" className="w-3.5 h-3.5" /> Adjust image</button>
                           )}
                         </div>
 
@@ -836,11 +837,17 @@ export default function Dashboard() {
       {imageEditor && (
         <CampaignImageEditor
           source={imageEditor.source}
+          imageLabel={imageEditor.target === "hero" ? "hero image" : "campaign image"}
+          initialMode={imageEditor.target === "hero" ? "crop" : "fit"}
           onClose={() => setImageEditor(null)}
           onSave={(image) => {
-            setConfig(prev => ({ ...prev, campaigns: prev.campaigns.map(camp =>
+            if (imageEditor.target === "hero") {
+              setConfig(prev => ({ ...prev, homepage: { ...prev.homepage, heroImage: image } }));
+            } else {
+              setConfig(prev => ({ ...prev, campaigns: prev.campaigns.map(camp =>
               camp.id === imageEditor.id ? { ...camp, img: image, tileImage: image, heroImage: image } : camp
-            ) }));
+              ) }));
+            }
             setImageEditor(null);
           }}
         />

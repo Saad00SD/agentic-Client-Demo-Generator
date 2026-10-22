@@ -3,13 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { Move } from "lucide-react";
 
-export default function CampaignImageEditor({ source, onSave, onClose, outputWidth = 1280, outputHeight = 720 }: {
+export default function CampaignImageEditor({ source, onSave, onClose, outputWidth = 1280, outputHeight = 720, imageLabel = "campaign image", initialMode = "fit" }: {
+  imageLabel?: string; initialMode?: "fit" | "crop";
   outputWidth?: number; outputHeight?: number;
   source: string; onSave: (image: string) => void; onClose: () => void;
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
-  const [mode, setMode] = useState("fit");
+  const [mode, setMode] = useState(initialMode);
   const [zoom, setZoom] = useState(1);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const drag = useRef<{ pointerId: number; x: number; y: number } | null>(null);
@@ -48,10 +49,10 @@ export default function CampaignImageEditor({ source, onSave, onClose, outputWid
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
       <section role="dialog" aria-modal="true" aria-labelledby="image-editor-title" className="bg-gray-900 text-white rounded-xl p-5 w-full max-w-2xl max-h-[95vh] overflow-auto border border-gray-700">
-        <h2 id="image-editor-title" className="text-lg font-semibold flex items-center gap-2"><Move className="w-5 h-5 text-blue-400" /> Adjust campaign image</h2>
+        <h2 id="image-editor-title" className="text-lg font-semibold flex items-center gap-2"><Move className="w-5 h-5 text-blue-400" /> Adjust {imageLabel}</h2>
         <p className="text-sm text-gray-400 my-2">Drag the image to move it. Use Crop and Zoom to frame the area you want. You can also focus the preview and use the arrow keys.</p>
         <canvas ref={canvas} width={outputWidth} height={outputHeight}
-          tabIndex={0} aria-label="Campaign image preview. Drag to move or use arrow keys."
+          tabIndex={0} aria-label={`${imageLabel} preview. Drag to move or use arrow keys.`}
           className={`w-full bg-white rounded-lg touch-none focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDragging ? "cursor-grabbing" : "cursor-grab"}`}
           onPointerDown={event => {
             if (!image || event.button !== 0 || drag.current) return;
@@ -86,7 +87,7 @@ export default function CampaignImageEditor({ source, onSave, onClose, outputWid
         />
         {error && <p role="alert" className="text-red-400">{error}</p>}
         <label className="block mt-4 text-sm">Image layout
-          <select autoFocus value={mode} onChange={e => { setMode(e.target.value); setZoom(1); setPosition({ x: 0, y: 0 }); }} className="ml-3 bg-gray-800 p-2 rounded">
+          <select autoFocus value={mode} onChange={e => { setMode(e.target.value === "crop" ? "crop" : "fit"); setZoom(1); setPosition({ x: 0, y: 0 }); }} className="ml-3 bg-gray-800 p-2 rounded">
             <option value="fit">Fit full image</option><option value="crop">Crop to fill</option>
           </select>
         </label>
