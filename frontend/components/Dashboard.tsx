@@ -6,8 +6,6 @@ import {
   Globe,
   Home,
   Megaphone,
-  CheckCircle2,
-  AlertCircle,
   Play,
   Download,
   Eye,
@@ -19,14 +17,13 @@ import {
   Palette,
   MapPin,
   RefreshCw,
-  Building2,
-  Sliders
+  Building2
 } from "lucide-react";
 import { ClientConfig, CampaignConfig, GenerationResult } from "../types";
 import PreviewModal from "./PreviewModal";
 import CampaignImageEditor from "./CampaignImageEditor";
 
-const API_BASE = "http://localhost:8000/api";
+const API_BASE = "/api";
 
 const DEFAULT_CONFIG: ClientConfig = {
   clientName: "Renault",
@@ -79,7 +76,7 @@ const DEFAULT_CONFIG: ClientConfig = {
       id: "trade-rewards",
       name: "Renault Sales Challenge",
       type: "Banded Incentive",
-      img: "assets/img/photo-goods-to-person.jpg",
+      img: "assets/img/drive-handover.jpg",
       href: "trade-rewards.html",
       blurb: "The core programme. Climb the ladder — Bronze, Silver, Gold.",
       status: "240 RON from Silver"
@@ -88,7 +85,7 @@ const DEFAULT_CONFIG: ClientConfig = {
       id: "varta",
       name: "Power Days Incentive",
       type: "",
-      img: "assets/img/photo-shuttle-aisle.jpg",
+      img: "assets/img/demonstrator.jpg",
       href: "varta-power-days.html",
       blurb: "Supplier funded. Points for every battery above baseline.",
       status: "20 RON earned"
@@ -97,7 +94,7 @@ const DEFAULT_CONFIG: ClientConfig = {
       id: "brake",
       name: "Brake Focus Q4",
       type: "",
-      img: "assets/img/photo-pickstation-portrait.jpg",
+      img: "assets/img/product-briefing.jpg",
       href: "brake-focus.html",
       blurb: "Discs, pads and fluid, each with its own target.",
       status: "140 RON earned"
@@ -106,7 +103,7 @@ const DEFAULT_CONFIG: ClientConfig = {
       id: "league",
       name: "The Forward League",
       type: "League Incentive",
-      img: "assets/img/photo-highbay-wide.jpg",
+      img: "assets/img/retailer-front.jpg",
       href: "league.html",
       blurb: "Your workshop against the rest of the region.",
       status: "14th of 38, up 5"
@@ -201,8 +198,9 @@ export default function Dashboard() {
         validation: data.validation
       });
       setGenLogs((prev) => [...prev, `Workflow Completed Successfully! Project: ${data.projectId}`]);
-    } catch (e: any) {
-      setGenLogs((prev) => [...prev, `Generation Error: Could not connect to generator backend.`]);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Could not connect to generator backend.";
+      setGenLogs((prev) => [...prev, `Generation Error: ${message}`]);
     } finally {
       setIsGenerating(false);
     }
@@ -216,7 +214,7 @@ export default function Dashboard() {
     }));
   };
 
-  const updateCountry = (field: string, val: any) => {
+  const updateCountry = <K extends keyof ClientConfig["country"],>(field: K, val: ClientConfig["country"][K]) => {
     setConfig((prev) => ({
       ...prev,
       country: { ...prev.country, [field]: val }
@@ -229,7 +227,7 @@ export default function Dashboard() {
       id: newId,
       name: "",
       type: "",
-      img: "assets/img/photo-goods-to-person.jpg",
+      img: "assets/img/drive-handover.jpg",
       blurb: "",
       status: ""
     };
@@ -801,7 +799,7 @@ export default function Dashboard() {
 
               <div className="bg-gray-950 p-3 rounded-xl border border-gray-900 font-mono text-[11px] h-52 overflow-y-auto flex flex-col gap-1.5 text-gray-300">
                 {genLogs.length === 0 ? (
-                  <span className="text-gray-600 italic">Click "Generate Client Demo" to start agentic workflow...</span>
+                  <span className="text-gray-600 italic">Click &quot;Generate Client Demo&quot; to start agentic workflow...</span>
                 ) : (
                   genLogs.map((log, i) => (
                     <div key={i} className="leading-tight">

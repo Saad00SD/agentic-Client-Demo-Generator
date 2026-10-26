@@ -236,10 +236,12 @@ def test_campaign_one_keeps_static_what_counts_images(tmp_path):
     page = (Path(result["output_dir"]) / "campaign-1.html").read_text(encoding="utf-8")
     import re
     grid = re.search(r'<div class="imgrid">(.*?)</div>\s*</div>\s*</div>', page, re.S)[1]
-    assert re.findall(r'<img src="([^"]+)"', grid) == [
-        "assets/img/drive-handover.jpg", "assets/img/detail-light.jpg",
-        "assets/img/detail-charge.jpg", "assets/img/handover-keys.jpg",
-    ]
+    template = (Path(MASTER_TEMPLATE_DIR) / "first-time-fix.html").read_text(encoding="utf-8")
+    original_grid = re.search(r'<div class="imgrid">(.*?)</div>\s*</div>\s*</div>', template, re.S)[1]
+    original_images = re.findall(r'<img src="([^"]+)"', original_grid)
+    assert len(original_images) == 4
+    assert re.findall(r'<img src="([^"]+)"', grid) == original_images
+    assert all((Path(result["output_dir"]) / image).is_file() for image in original_images)
 
 
 def test_uploaded_logo_is_browser_icon_on_every_page(tmp_path):

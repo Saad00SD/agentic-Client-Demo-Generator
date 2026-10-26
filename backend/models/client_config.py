@@ -2,7 +2,7 @@ from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 
 class BrandingConfig(BaseModel):
-    logo: str = "assets/lkq-logo.svg"
+    logo: str = "assets/geely-logo.svg"
     primaryColor: str = "#085CF0"
     secondaryColor: str = "#000000"
     accentColor: str = "#F3FF66"
@@ -36,7 +36,7 @@ class CampaignConfig(BaseModel):
     id: str
     name: str
     type: str = "Hit & Win Incentive"
-    img: str = "assets/img/photo-goods-to-person.jpg"
+    img: str = "assets/img/drive-handover.jpg"
     tileImage: Optional[str] = None
     heroImage: Optional[str] = None
     href: str = "#"

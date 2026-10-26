@@ -1,0 +1,9 @@
+*
+!backend/
+!backend/**
+!master-template/
+!master-template/**
+!pyproject.toml
+!uv.lock
+**/__pycache__/
+**/*.pyc

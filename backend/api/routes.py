@@ -179,17 +179,17 @@ async def get_status(project_id: str):
 
 @router.get("/projects/{project_id}/preview/{file_path:path}")
 async def preview_file(project_id: str, file_path: str):
-    proj_dir = Path(GENERATED_DIR) / project_id
+    proj_dir = (Path(GENERATED_DIR) / project_id).resolve()
     if not proj_dir.exists():
         raise HTTPException(status_code=404, detail="Project output not found")
 
     target_file = (proj_dir / file_path).resolve()
 
     # Prevent path traversal outside project directory
-    if not str(target_file).startswith(str(proj_dir)):
+    if not target_file.is_relative_to(proj_dir):
         raise HTTPException(status_code=403, detail="Access denied: path traversal detected")
 
-    if not target_file.exists():
+    if not target_file.is_file():
         raise HTTPException(status_code=404, detail=f"File not found: {file_path}")
 
     return FileResponse(str(target_file))

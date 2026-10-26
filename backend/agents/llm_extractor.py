@@ -99,8 +99,8 @@ def extract_client_config_from_prompt(prompt: str) -> Dict[str, Any]:
                 "id": f"camp-{idx+1}",
                 "name": name,
                 "type": "Hit & Win Incentive",
-                "img": "assets/img/photo-goods-to-person.jpg",
-                "tileImage": "assets/img/photo-goods-to-person.jpg",
+                "img": "assets/img/drive-handover.jpg",
+                "tileImage": "assets/img/drive-handover.jpg",
                 "blurb": f"Boost performance with {name}.",
                 "status": "Active"
             })
