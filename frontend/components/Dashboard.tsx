@@ -17,11 +17,14 @@ import {
   Palette,
   MapPin,
   RefreshCw,
-  Building2
+  Building2,
+  Bot
 } from "lucide-react";
 import { ClientConfig, CampaignConfig, GenerationResult } from "../types";
 import PreviewModal from "./PreviewModal";
 import CampaignImageEditor from "./CampaignImageEditor";
+import GenerationModal from "./GenerationModal";
+import UserAccountMenu from "./UserAccountMenu";
 
 const API_BASE = "/api";
 
@@ -253,13 +256,13 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gradient-to-b from-gray-950 via-gray-900 to-black text-gray-100 flex flex-col">
       {/* Top Header */}
       <header className="border-b border-gray-800 bg-gray-950/80 sticky top-0 z-40 backdrop-blur-md">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-500/20">
               <Layers className="w-5 h-5" />
             </div>
-            <div>
-              <h1 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+            <div className="min-w-0">
+              <h1 className="truncate text-sm sm:text-lg font-bold tracking-tight text-white">
                 Client Demo Generator
 
               </h1>
@@ -267,11 +270,12 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 text-xs text-gray-400 bg-gray-900 px-3 py-1.5 rounded-full border border-gray-800">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              FastAPI Engine Online
+          <div className="flex shrink-0 items-center gap-2 sm:gap-4">
+            <div className="flex items-center gap-2 text-xs text-blue-300 bg-blue-500/10 px-3 py-2 rounded-full border border-blue-500/20">
+              <Bot aria-hidden="true" className="h-4 w-4" />
+              <span className="whitespace-nowrap">Agent tool</span>
             </div>
+            <UserAccountMenu />
           </div>
         </div>
       </header>
@@ -831,6 +835,8 @@ export default function Dashboard() {
           </div>
         </div>
       </main>
+
+      {isGenerating && <GenerationModal clientName={config.clientName} />}
 
       {imageEditor && (
         <CampaignImageEditor

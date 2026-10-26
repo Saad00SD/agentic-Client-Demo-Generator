@@ -29,3 +29,25 @@
 .glow-accent {
   box-shadow: 0 0 25px -5px rgba(243, 255, 102, 0.25);
 }
+
+.generation-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+}
+
+.generation-progress {
+  animation: generation-progress 1.6s ease-in-out infinite;
+}
+
+@keyframes generation-progress {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(300%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .generation-progress {
+    animation: none;
+    width: 100%;
+    opacity: 0.7;
+  }
+}
