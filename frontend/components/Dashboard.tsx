@@ -135,6 +135,8 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<"client" | "country" | "homepage" | "campaigns">("client");
   const [isGenerating, setIsGenerating] = useState(false);
   const [genLogs, setGenLogs] = useState<string[]>([]);
+  const [isLogVisible, setIsLogVisible] = useState(false);
+  const [generationOutcome, setGenerationOutcome] = useState<"passed" | "failed" | null>(null);
   const [result, setResult] = useState<GenerationResult | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [imageEditor, setImageEditor] = useState<{ target: "hero"; source: string } | { target: "campaign"; id: string; source: string } | null>(null);
@@ -178,6 +180,8 @@ export default function Dashboard() {
   const handleGenerate = async () => {
     if (!canGenerate || isGenerating) return;
     setIsGenerating(true);
+    setIsLogVisible(false);
+    setGenerationOutcome(null);
     setResult(null);
     setGenLogs(["Generating your demo from the master template and entered details..."]);
 
@@ -201,9 +205,11 @@ export default function Dashboard() {
         validation: data.validation
       });
       setGenLogs((prev) => [...prev, `Workflow Completed Successfully! Project: ${data.projectId}`]);
+      setGenerationOutcome(data.validation?.valid === false ? "failed" : "passed");
     } catch (error) {
       const message = error instanceof Error ? error.message : "Could not connect to generator backend.";
       setGenLogs((prev) => [...prev, `Generation Error: ${message}`]);
+      setGenerationOutcome("failed");
     } finally {
       setIsGenerating(false);
     }
@@ -555,7 +561,9 @@ export default function Dashboard() {
 
             {activeTab === "homepage" && (
               <div className="glass-panel p-6 flex flex-col gap-5">
-                <h3 className="text-base font-semibold text-white border-b border-gray-800 pb-3">Homepage</h3>
+                <h3 className="text-base font-semibold text-white border-b border-gray-800 pb-3 flex items-center gap-2">
+                  <Home aria-hidden="true" className="w-4 h-4 text-blue-400" /> Homepage
+                </h3>
                 <label className="text-sm text-gray-300">Hero title *
                   <input required placeholder={`e.g. ${DEFAULT_CONFIG.homepage.title}`} value={config.homepage.title} onChange={e => setConfig(prev => ({ ...prev, homepage: { ...prev.homepage, title: e.target.value } }))} className="w-full mt-2 bg-gray-900 border border-gray-700 rounded-lg p-3 text-white" />
                 </label>
@@ -794,13 +802,26 @@ export default function Dashboard() {
             <div className="glass-panel p-5 border-gray-800 flex flex-col gap-3">
               <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider flex items-center justify-between">
                 <span>Generation Execution Log</span>
-                {result && (
-                  <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-                    PASSED
+                {!isGenerating && generationOutcome && (
+                  <span role="status" className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${generationOutcome === "passed"
+                    ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
+                    : "text-red-400 bg-red-500/10 border-red-500/20"}`}>
+                    {generationOutcome === "passed" ? "PASSED" : "FAILED"}
                   </span>
                 )}
               </h4>
 
+              <button
+                type="button"
+                onClick={() => setIsLogVisible((visible) => !visible)}
+                aria-expanded={isLogVisible}
+                aria-controls="generation-execution-log"
+                className="self-start rounded-lg border border-gray-700 px-3 py-2 text-xs font-medium text-gray-300 transition hover:border-blue-500 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-400"
+              >
+                {isLogVisible ? "Hide log" : "View log"}
+              </button>
+
+              <div id="generation-execution-log" hidden={!isLogVisible}>
               <div className="bg-gray-950 p-3 rounded-xl border border-gray-900 font-mono text-[11px] h-52 overflow-y-auto flex flex-col gap-1.5 text-gray-300">
                 {genLogs.length === 0 ? (
                   <span className="text-gray-600 italic">Click &quot;Generate Client Demo&quot; to start agentic workflow...</span>
@@ -811,6 +832,7 @@ export default function Dashboard() {
                     </div>
                   ))
                 )}
+              </div>
               </div>
 
               {/* Result Actions */}
