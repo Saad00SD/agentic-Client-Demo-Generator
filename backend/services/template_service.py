@@ -2,11 +2,13 @@ import os
 import shutil
 import stat
 from pathlib import Path
+from backend.observability import instrument
 
 def _remove_readonly(func, path, exc_info):
     os.chmod(path, stat.S_IWRITE)
     func(path)
 
+@instrument("template.copy_master")
 def copy_master_template(master_template_dir: str, output_dir: str) -> str:
     master_path = Path(master_template_dir).resolve()
     target_path = Path(output_dir).resolve()

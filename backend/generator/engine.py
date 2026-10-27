@@ -11,7 +11,9 @@ from backend.services.asset_service import copy_asset, save_data_url_asset, save
 from backend.services.localization_service import generate_locales
 from backend.services.validation_service import validate_generated_demo, ValidationReport
 from backend.services.packaging_service import package_demo_to_zip
+from backend.observability import instrument, annotate
 
+@instrument("template.generate_demo")
 def generate_demo(
     client_config: Any,
     master_template_dir: str,
@@ -125,6 +127,10 @@ def generate_demo(
     # 7. Package ZIP archive
     zip_path = str(target_path) + ".zip"
     created_zip = package_demo_to_zip(str(target_path), zip_path)
+    annotate(validation_valid=report.valid, validation_error_count=len(report.errors),
+             validation_warning_count=len(report.warnings), campaign_count=len(campaigns),
+             page_count=sum(1 for _ in target_path.rglob("*.html")),
+             zip_bytes=Path(created_zip).stat().st_size)
 
     return {
         "status": "success" if report.valid else "warning",

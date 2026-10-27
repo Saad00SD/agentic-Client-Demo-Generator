@@ -10,6 +10,10 @@ import xml.etree.ElementTree as ET
 from urllib.parse import unquote_to_bytes
 
 
+from backend.observability import instrument
+
+
+@instrument("assets.prepare_logo")
 def save_logo_as_svg(source: str, dest_dir: str) -> str:
     """Keep vector uploads as SVG; embed raster uploads in a portable SVG."""
     if source.startswith("data:"):
@@ -50,6 +54,7 @@ def sanitize_filename(filename: str) -> str:
     clean_name = re.sub(r'[^a-zA-Z0-9_\.\-]', '_', clean_name)
     return clean_name
 
+@instrument("assets.copy")
 def copy_asset(src_path: str, dest_dir: str, filename: Optional[str] = None) -> str:
     src = Path(src_path).resolve()
     if not src.exists():
@@ -68,6 +73,7 @@ def copy_asset(src_path: str, dest_dir: str, filename: Optional[str] = None) -> 
     shutil.copy2(src, dest)
     return str(dest)
 
+@instrument("assets.save_image")
 def save_data_url_asset(data_url: str, dest_dir: str, filename_prefix: str = "asset") -> str:
     """Decodes base64 data URL and saves to dest_dir, returning the file path."""
     import base64

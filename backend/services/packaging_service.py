@@ -1,7 +1,9 @@
 import shutil
 import os
 from pathlib import Path
+from backend.observability import instrument
 
+@instrument("packaging.create_zip")
 def package_demo_to_zip(output_dir: str, zip_output_path: str) -> str:
     source_path = Path(output_dir).resolve()
     zip_path = Path(zip_output_path).resolve()

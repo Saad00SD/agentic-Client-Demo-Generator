@@ -128,10 +128,20 @@ const INITIAL_CONFIG: ClientConfig = {
   }))
 };
 
-export default function Dashboard() {
-  const [config, setConfig] = useState<ClientConfig>(INITIAL_CONFIG);
-  const [rawRegions, setRawRegions] = useState<string>("");
-  const [rawBranches, setRawBranches] = useState<string>("");
+interface DashboardProps {
+  initialConfig?: ClientConfig;
+  onSave?: (config: ClientConfig) => Promise<void>;
+  onGenerate?: (config: ClientConfig) => Promise<GenerationResult>;
+  assetBaseUrl?: string;
+}
+
+export default function Dashboard({ initialConfig, onSave, onGenerate, assetBaseUrl = "" }: DashboardProps = {}) {
+  const imageSource = (source: string) => source.startsWith("assets/") ? assetBaseUrl + source : source;
+  const [config, setConfig] = useState<ClientConfig>(initialConfig || INITIAL_CONFIG);
+  const [rawRegions, setRawRegions] = useState<string>(initialConfig?.countryConfig.regions.join(", ") || "");
+  const [rawBranches, setRawBranches] = useState<string>(initialConfig?.countryConfig.branches.join(", ") || "");
+  const [saveError, setSaveError] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"client" | "country" | "homepage" | "campaigns">("client");
   const [isGenerating, setIsGenerating] = useState(false);
   const [genLogs, setGenLogs] = useState<string[]>([]);
@@ -186,6 +196,12 @@ export default function Dashboard() {
     setGenLogs(["Generating your demo from the master template and entered details..."]);
 
     try {
+      if (onGenerate) {
+        const generated = await onGenerate(config);
+        setResult(generated);
+        setGenerationOutcome(generated.validation?.valid === false ? "failed" : "passed");
+        return;
+      }
       const res = await fetch(`${API_BASE}/generate-direct`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -277,6 +293,13 @@ export default function Dashboard() {
           </div>
 
           <div className="flex shrink-0 items-center gap-2 sm:gap-4">
+            {onSave && <button disabled={isSaving || isGenerating} className="rounded-lg bg-blue-600 px-3 py-2 text-xs disabled:opacity-50" onClick={async () => {
+              setIsSaving(true);
+              setSaveError("");
+              try { await onSave(config); }
+              catch (error) { setSaveError(error instanceof Error ? error.message : "Could not save details"); }
+              finally { setIsSaving(false); }
+            }}>{isSaving ? "Saving…" : "Save details & return to chat"}</button>}
             <div className="flex items-center gap-2 text-xs text-blue-300 bg-blue-500/10 px-3 py-2 rounded-full border border-blue-500/20">
               <Bot aria-hidden="true" className="h-4 w-4" />
               <span className="whitespace-nowrap">Agent tool</span>
@@ -288,6 +311,7 @@ export default function Dashboard() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8 flex flex-col gap-8">
+        {saveError && <p role="alert" className="text-red-300">{saveError}</p>}
         {/* Dashboard Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Form Tabs Column (Left - 8 cols) */}
@@ -380,7 +404,7 @@ export default function Dashboard() {
                     <div className="w-24 h-24 rounded-xl bg-gray-900 border border-gray-700 flex items-center justify-center p-2 relative group overflow-hidden shrink-0">
                       {config.branding.logo ? (
                         <img
-                          src={config.branding.logo}
+                          src={imageSource(config.branding.logo)}
                           alt="Client Logo"
                           className="max-h-full max-w-full object-contain"
                         />
@@ -587,8 +611,8 @@ export default function Dashboard() {
                 </div>
                 <p className="text-xs text-gray-400">Upload an image, then crop, zoom, and drag to frame your hero background. Wide images work best. The visible area varies with screen size.</p>
                 {config.homepage.heroImage && <>
-                  <img src={config.homepage.heroImage} alt="Homepage background preview" className="w-full max-h-64 object-contain rounded-lg bg-gray-950" />
-                  <button type="button" onClick={() => setImageEditor({ target: "hero", source: config.homepage.heroImage })} className="inline-flex items-center justify-center gap-1.5 self-start rounded-lg border border-blue-500/20 bg-blue-500/10 px-3 py-2 text-xs text-blue-400 hover:bg-blue-500/20 transition"><Move aria-hidden="true" className="w-3.5 h-3.5" /> Crop and adjust</button>
+                  <img src={imageSource(config.homepage.heroImage)} alt="Homepage background preview" className="w-full max-h-64 object-contain rounded-lg bg-gray-950" />
+                  <button type="button" onClick={() => setImageEditor({ target: "hero", source: imageSource(config.homepage.heroImage) })} className="inline-flex items-center justify-center gap-1.5 self-start rounded-lg border border-blue-500/20 bg-blue-500/10 px-3 py-2 text-xs text-blue-400 hover:bg-blue-500/20 transition"><Move aria-hidden="true" className="w-3.5 h-3.5" /> Crop and adjust</button>
                   <button type="button" onClick={() => setConfig(prev => ({ ...prev, homepage: { ...prev.homepage, heroImage: "" } }))} className="text-sm text-blue-400 self-start">Use template image</button>
                 </>}
               </div>
@@ -632,7 +656,7 @@ export default function Dashboard() {
                           <label className="text-xs font-medium text-gray-300">Campaign Image</label>
                           <div className="w-full h-32 rounded-xl bg-gray-900 border border-gray-700 overflow-hidden relative group flex items-center justify-center">
                             {camp.img?.startsWith("data:") ? (
-                              <img src={camp.img} alt={camp.name || "Campaign image preview"} className="w-full h-full object-contain" />
+                              <img src={imageSource(camp.img)} alt={camp.name || "Campaign image preview"} className="w-full h-full object-contain" />
                             ) : (
                               <div className="flex flex-col items-center gap-2 text-gray-400">
                                 <div className="rounded-2xl bg-blue-500/10 p-3 ring-1 ring-blue-500/20">
@@ -764,7 +788,7 @@ export default function Dashboard() {
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 overflow-hidden">
                     {config.branding.logo && (
-                      <img src={config.branding.logo} alt="Logo" className="max-h-7 max-w-[60px] object-contain shrink-0" />
+                      <img src={imageSource(config.branding.logo)} alt="Logo" className="max-h-7 max-w-[60px] object-contain shrink-0" />
                     )}
                     <div className="font-bold text-white text-sm truncate">
                       {config.clientName} <span className="text-xs font-normal opacity-70">{config.platformName}</span>
@@ -784,7 +808,7 @@ export default function Dashboard() {
                     style={{ backgroundColor: "rgba(255,255,255,0.1)", color: "#ffffff" }}
                   >
                     {config.campaigns[0].img?.startsWith("data:") ? (
-                      <img src={config.campaigns[0].img} alt="" className="w-10 h-10 rounded object-cover flex-shrink-0" />
+                      <img src={imageSource(config.campaigns[0].img)} alt="" className="w-10 h-10 rounded object-cover flex-shrink-0" />
                     ) : (
                       <ImagePlus aria-hidden="true" className="w-10 h-10 rounded bg-white/10 p-2 text-blue-400 flex-shrink-0" />
                     )}

@@ -4,6 +4,7 @@ import glob
 from pathlib import Path
 from typing import List, Dict, Any
 from pydantic import BaseModel
+from backend.observability import instrument
 
 class ValidationReport(BaseModel):
     valid: bool
@@ -38,6 +39,7 @@ REQUIRED_ASSETS = [
     "assets/i18n.js"
 ]
 
+@instrument("validation.check_demo")
 def validate_generated_demo(output_dir: str, config: Dict[str, Any]) -> ValidationReport:
     errors = []
     warnings = []

@@ -2,6 +2,7 @@ import os
 import json
 from pathlib import Path
 from typing import List, Dict, Any
+from backend.observability import instrument
 
 LOCALE_TEMPLATES = {
     "en": {
@@ -129,6 +130,7 @@ LOCALE_TEMPLATES = {
     }
 }
 
+@instrument("localization.generate")
 def generate_locales(output_dir: str, languages: List[Dict[str, str]], client_name: str, platform_name: str) -> List[str]:
     locales_dir = Path(output_dir) / "locales"
     os.makedirs(locales_dir, exist_ok=True)

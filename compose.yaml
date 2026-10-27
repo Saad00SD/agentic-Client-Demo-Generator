@@ -4,6 +4,8 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     restart: unless-stopped
+    env_file:
+      - .env
     volumes:
       - generated:/app/generated
       - uploads:/app/uploads
