@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Client Demo Generator Agent",
-  description: "Generate customized client demo websites from your entered details and the existing master template.",
+  description: "Chat with the Groq-powered demo agent, upload client images, and preview and edit your branded website.",
   icons: {
     icon: { url: "/icon.svg", type: "image/svg+xml" },
   },

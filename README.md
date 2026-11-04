@@ -1,5 +1,54 @@
 # AI-Powered Client Demo Generator
 
+LangSmith tracing is implemented for chat, Groq usage, agent decisions, generation,
+validation, configuration edits, and preview/download actions. See the
+[LangSmith setup and usage guide](docs/langsmith.md) for configuration, trace navigation,
+cost tracking, and troubleshooting. Verify delivery with
+`uv run python -m backend.check_tracing`.
+
+## v3.0: conversational demo agent
+
+The home page is now a chat workspace. The Groq agent collects client details,
+asks follow-up questions, drafts branding, homepage copy and campaigns, and selects
+whether to ask, update the configuration, or run the LangGraph generation workflow.
+The existing master template remains the renderer; this version generates structured
+content and configuration rather than arbitrary website source code.
+
+1. Set `GROQ_API_KEY` in the root `.env`. Optionally set
+   `GROQ_MODEL=openai/gpt-oss-120b` to select another Groq-supported chat model.
+2. Start the backend with `uv run uvicorn backend.main:app --reload` and the frontend
+   with `cd frontend` then `npm run dev`. Restart the backend after changing `.env`.
+   Docker Compose also passes `.env` to the backend.
+3. Describe the client, platform name and country. Attach a logo, homepage image,
+   or an image for an existing campaign using the image-purpose selector, then send.
+4. Ask the agent to generate the demo, or use **Generate demo** once the required
+   details are present. The generated site appears alongside the conversation.
+5. Continue chatting to revise details, or open **Edit details** for the existing
+   branding, country, homepage and campaign forms. Save back to chat and rebuild,
+   or generate directly from the editor. Each build gets its own preview and ZIP.
+
+Conversations and original uploaded image data are persisted in
+`uploads/conversations/`, outside the downloadable demo. The browser remembers the
+latest conversation ID and restores it on reload, including after backend restarts.
+Images are stored locally and applied to the site; the text model receives image
+references rather than image bytes and does not visually analyze them. Client text
+and configuration are sent to Groq to process the conversation. **New demo** starts
+a fresh conversation and retains previous files on disk.
+
+The agent output is validated against `ClientConfig`, and invalid JSON/schema or
+unavailable image references get one correction attempt. Provider failures are
+shown in the chat without replacing the saved configuration. Manual edits remain
+available after generation. Changed details show a rebuild reminder above the preview.
+
+Chat API: `POST /api/conversations`, `GET /api/conversations/{id}`,
+`POST /api/conversations/{id}/messages`, `PUT /api/conversations/{id}/config`,
+and `POST /api/conversations/{id}/generate`. Earlier generation APIs remain available.
+
+Validation: `uv run pytest tests -q`, `node --test tests/client-branding.test.cjs`,
+and, inside `frontend`, `npx tsc --noEmit`, `npm run lint`, `npm run build`.
+The conversation tests mock Groq and cover persistent state, attachment preservation,
+revision/rebuild, invalid input, invalid model output and provider failure handling.
+
 An end-to-end agentic application that transforms a **Master Demo Template** into customized, client-branded interactive demo websites using **Python, FastAPI, LangGraph, Pydantic, and Next.js**.
 
 ---
@@ -49,7 +98,7 @@ flowchart TD
 - **Backend**: Python 3.13, FastAPI, LangGraph, Pydantic v2, Uvicorn, Pytest
 - **Frontend**: Next.js 15 (App Router), TypeScript, Tailwind CSS, Lucide React
 - **Master Template Engine**: Pure HTML5, Vanilla CSS (CSS Custom Properties), JavaScript (ES6+), Client i18n engine (`locales/*.json`)
-- **LLM Integration**: OpenAI SDK / LangChain Core with structured JSON output schema + rule-based offline fallback
+- **LLM Integration**: Groq Chat Completions with validated JSON configuration updates and conversational generation decisions
 
 ---
 

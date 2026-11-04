@@ -3,7 +3,9 @@ import json
 import re
 from typing import Dict, Any
 from backend.models.client_config import ClientConfig
+from backend.observability import instrument
 
+@instrument("requirements.extract", "chain")
 def extract_client_config_from_prompt(prompt: str) -> Dict[str, Any]:
     api_key = os.environ.get("OPENAI_API_KEY")
 

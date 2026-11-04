@@ -78,6 +78,7 @@ export interface ClientConfig {
 }
 
 export interface GenerationResult {
+  traceId?: string;
   projectId: string;
   status: string;
   previewUrl: string;

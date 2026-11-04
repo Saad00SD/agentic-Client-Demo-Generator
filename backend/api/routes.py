@@ -10,6 +10,7 @@ from backend.models.client_config import ClientConfig
 from backend.agents.graph import demo_graph
 from backend.agents.llm_extractor import extract_client_config_from_prompt
 from backend.generator.engine import generate_demo
+from backend.observability import annotate, instrument, register_artifact
 
 router = APIRouter(prefix="/api")
 
@@ -25,6 +26,7 @@ os.makedirs(GENERATED_DIR, exist_ok=True)
 os.makedirs(UPLOADS_DIR, exist_ok=True)
 
 @router.post("/projects")
+@instrument("project.create", "chain")
 async def create_project(data: Optional[Dict[str, Any]] = None):
     project_id = f"proj-{uuid.uuid4().hex[:8]}"
     client_config = data.get("clientConfig") if data else None
@@ -45,6 +47,7 @@ async def create_project(data: Optional[Dict[str, Any]] = None):
     return {"projectId": project_id, "status": "created", "project": PROJECTS[project_id]}
 
 @router.post("/projects/{project_id}/requirements")
+@instrument("project.requirements", "chain")
 async def set_requirements(project_id: str, body: Dict[str, Any]):
     if project_id not in PROJECTS:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -60,6 +63,7 @@ async def set_requirements(project_id: str, body: Dict[str, Any]):
     return {"projectId": project_id, "clientConfig": PROJECTS[project_id]["client_config"]}
 
 @router.post("/projects/{project_id}/assets")
+@instrument("project.upload_asset")
 async def upload_asset(
     project_id: str,
     asset_type: str = Form("logo"),
@@ -87,6 +91,7 @@ async def upload_asset(
     }
 
 @router.post("/projects/{project_id}/generate")
+@instrument("project.generate", "chain")
 async def generate_project(project_id: str):
     if project_id not in PROJECTS:
         raise HTTPException(status_code=404, detail="Project not found")
@@ -97,12 +102,14 @@ async def generate_project(project_id: str):
     # Execute LangGraph workflow
     execution_log = ["LangGraph: Initializing Demo Generation Workflow..."]
     final_state = dict(state)
-    for step_number, updates in enumerate(demo_graph.stream(state, stream_mode="updates"), 1):
+    for step_number, updates in enumerate(demo_graph.stream(state, config={"metadata": {"project_id": project_id}}, stream_mode="updates"), 1):
         for node_name, update in updates.items():
             execution_log.append(f"LangGraph [Node {step_number}]: {node_name}")
             final_state.update(update)
 
     PROJECTS[project_id] = final_state
+    annotate(project_id=project_id, validation_valid=(final_state.get("report") or {}).get("valid"))
+    register_artifact(project_id)
 
     return {
         "projectId": project_id,
@@ -115,6 +122,7 @@ async def generate_project(project_id: str):
     }
 
 @router.post("/generate-direct")
+@instrument("demo.generate_direct", "chain")
 async def generate_direct(body: Dict[str, Any]):
     project_id = f"direct-{uuid.uuid4().hex[:8]}"
     client_config = body.get("clientConfig")
@@ -127,6 +135,7 @@ async def generate_direct(body: Dict[str, Any]):
         client_config = ClientConfig().model_dump()
 
     output_dir = os.path.join(GENERATED_DIR, project_id)
+    annotate(project_id=project_id)
 
     res = generate_demo(
         client_config=client_config,
@@ -144,6 +153,8 @@ async def generate_direct(body: Dict[str, Any]):
         "zip_path": res["zip_path"],
         "report": res["validation"]
     }
+    annotate(validation_valid=res["validation"].get("valid"))
+    register_artifact(project_id)
 
     return {
         "projectId": project_id,
@@ -178,6 +189,7 @@ async def get_status(project_id: str):
     }
 
 @router.get("/projects/{project_id}/preview/{file_path:path}")
+@instrument("demo.preview")
 async def preview_file(project_id: str, file_path: str):
     proj_dir = (Path(GENERATED_DIR) / project_id).resolve()
     if not proj_dir.exists():
@@ -195,6 +207,7 @@ async def preview_file(project_id: str, file_path: str):
     return FileResponse(str(target_file))
 
 @router.get("/projects/{project_id}/download")
+@instrument("demo.download")
 async def download_project_zip(project_id: str):
     zip_path = Path(GENERATED_DIR) / f"{project_id}.zip"
     if not zip_path.exists():
