@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Client Demo Generator Agent",
+  title: "DemoForge AI",
   description: "Chat with the Groq-powered demo agent, upload client images, and preview and edit your branded website.",
   icons: {
     icon: { url: "/icon.svg", type: "image/svg+xml" },
